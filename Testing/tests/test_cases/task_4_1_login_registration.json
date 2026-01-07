@@ -1,0 +1,132 @@
+{
+  "subtask": "4.1",
+  "name": "Login & Registration UI Tests",
+  "description": "Test cases for login and registration page wireframes",
+  "test_cases": [
+    {
+      "name": "login_page_loads",
+      "description": "Verify login page loads and displays correctly",
+      "url": "/auth/login",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Login"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h2",
+          "text": "Login"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='email']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='password']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "button[type='submit']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='register']"
+        }
+      ]
+    },
+    {
+      "name": "register_page_loads",
+      "description": "Verify registration page loads and displays correctly",
+      "url": "/auth/register",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Register"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h2",
+          "text": "Register"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='email']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='password']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='confirm_password']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='first_name']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "input[name='last_name']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "button[type='submit']"
+        }
+      ]
+    },
+    {
+      "name": "login_form_structure",
+      "description": "Verify login form has correct structure",
+      "url": "/auth/login",
+      "assertions": [
+        {
+          "type": "element_count",
+          "selector": "form",
+          "count": 1
+        },
+        {
+          "type": "element_visible",
+          "selector": "form[method='POST']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "label[for='email']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "label[for='password']"
+        }
+      ]
+    },
+    {
+      "name": "register_form_structure",
+      "description": "Verify registration form has correct structure",
+      "url": "/auth/register",
+      "assertions": [
+        {
+          "type": "element_count",
+          "selector": "form",
+          "count": 1
+        },
+        {
+          "type": "element_visible",
+          "selector": "form[method='POST']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "label[for='email']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "label[for='password']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "label[for='confirm_password']"
+        }
+      ]
+    }
+  ]
+}
+
