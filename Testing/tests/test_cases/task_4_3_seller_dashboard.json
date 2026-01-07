@@ -1,0 +1,89 @@
+{
+  "subtask": "4.3",
+  "name": "Seller Dashboard UI Tests",
+  "description": "Test cases for seller dashboard wireframe",
+  "test_cases": [
+    {
+      "name": "seller_dashboard_loads",
+      "description": "Verify seller dashboard loads and displays correctly",
+      "url": "/seller/dashboard",
+      "requires_auth": true,
+      "role": "seller",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Seller Dashboard"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1",
+          "text": "Seller Dashboard"
+        },
+        {
+          "type": "element_visible",
+          "selector": ".dashboard-stats"
+        }
+      ]
+    },
+    {
+      "name": "seller_dashboard_stat_cards",
+      "description": "Verify seller dashboard displays stat cards",
+      "url": "/seller/dashboard",
+      "requires_auth": true,
+      "role": "seller",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".stat-card"
+        },
+        {
+          "type": "element_count",
+          "selector": ".stat-card",
+          "min_count": 3
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Products"
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Orders"
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Revenue"
+        }
+      ]
+    },
+    {
+      "name": "seller_dashboard_quick_actions",
+      "description": "Verify seller dashboard has quick action links",
+      "url": "/seller/dashboard",
+      "requires_auth": true,
+      "role": "seller",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".card-header h2",
+          "text": "Quick Actions"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='products']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='inventory']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='orders']"
+        }
+      ]
+    }
+  ]
+}
+
