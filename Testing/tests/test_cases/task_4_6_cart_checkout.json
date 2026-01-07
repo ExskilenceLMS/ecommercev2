@@ -1,0 +1,119 @@
+{
+  "subtask": "4.6",
+  "name": "Cart & Checkout Flow UI Tests",
+  "description": "Test cases for cart and checkout flow wireframes",
+  "test_cases": [
+    {
+      "name": "cart_page_loads",
+      "description": "Verify cart page loads and displays correctly",
+      "url": "/cart",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Shopping Cart"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1",
+          "text": "Shopping Cart"
+        }
+      ]
+    },
+    {
+      "name": "cart_table_structure",
+      "description": "Verify cart page has table structure for items",
+      "url": "/cart",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "table"
+        },
+        {
+          "type": "element_visible",
+          "selector": "th"
+        }
+      ]
+    },
+    {
+      "name": "cart_checkout_button",
+      "description": "Verify cart page has checkout button",
+      "url": "/cart",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "a[href*='checkout']"
+        }
+      ]
+    },
+    {
+      "name": "checkout_review_page_loads",
+      "description": "Verify checkout review page loads and displays correctly",
+      "url": "/checkout/review",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Checkout"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1",
+          "text": "Review Order"
+        }
+      ]
+    },
+    {
+      "name": "checkout_shipping_address",
+      "description": "Verify checkout page has shipping address section",
+      "url": "/checkout/review",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".card-header h2",
+          "text": "Shipping Address"
+        },
+        {
+          "type": "element_visible",
+          "selector": "form[method='POST']"
+        }
+      ]
+    },
+    {
+      "name": "checkout_order_summary",
+      "description": "Verify checkout page has order summary section",
+      "url": "/checkout/review",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".card-header h2",
+          "text": "Order Summary"
+        }
+      ]
+    },
+    {
+      "name": "checkout_place_order_button",
+      "description": "Verify checkout page has place order button",
+      "url": "/checkout/review",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "button[type='submit']"
+        }
+      ]
+    }
+  ]
+}
+
