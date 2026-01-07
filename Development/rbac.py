@@ -64,3 +64,93 @@ class RBAC:
             return []
         return RBAC.PERMISSIONS[user_role]
     
+
+# Restrict seller/admin/customer actions
+def role_required(required_role):
+    """Decorator to require specific role"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                flash('Please log in to access this page.', 'warning')
+                return redirect(url_for('auth.login'))
+            
+            user_role = getattr(current_user, 'role', None)
+            if not RBAC.has_role(user_role, required_role):
+                flash('You do not have permission to access this page.', 'error')
+                abort(403)
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
+def admin_required(f):
+    """Decorator to require admin role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('auth.login'))
+        
+        user_role = getattr(current_user, 'role', None)
+        if user_role != 'admin':
+            flash('Admin access required.', 'error')
+            abort(403)
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def seller_required(f):
+    """Decorator to require seller role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('auth.login'))
+        
+        user_role = getattr(current_user, 'role', None)
+        if user_role not in ['admin', 'seller']:
+            flash('Seller access required.', 'error')
+            abort(403)
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def customer_required(f):
+    """Decorator to require customer role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('auth.login'))
+        
+        user_role = getattr(current_user, 'role', None)
+        if user_role not in ['admin', 'customer']:
+            flash('Customer access required.', 'error')
+            abort(403)
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def permission_required(permission):
+    """Decorator to require specific permission"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                flash('Please log in to access this page.', 'warning')
+                return redirect(url_for('auth.login'))
+            
+            user_role = getattr(current_user, 'role', None)
+            if not RBAC.has_permission(user_role, permission):
+                flash('You do not have permission to perform this action.', 'error')
+                abort(403)
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
