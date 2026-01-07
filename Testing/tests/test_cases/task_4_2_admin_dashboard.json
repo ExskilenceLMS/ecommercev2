@@ -1,0 +1,94 @@
+{
+  "subtask": "4.2",
+  "name": "Admin Dashboard UI Tests",
+  "description": "Test cases for admin dashboard wireframe",
+  "test_cases": [
+    {
+      "name": "admin_dashboard_loads",
+      "description": "Verify admin dashboard loads and displays correctly",
+      "url": "/admin/dashboard",
+      "requires_auth": true,
+      "role": "admin",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Admin Dashboard"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1",
+          "text": "Admin Dashboard"
+        },
+        {
+          "type": "element_visible",
+          "selector": ".dashboard-stats"
+        }
+      ]
+    },
+    {
+      "name": "admin_dashboard_stat_cards",
+      "description": "Verify admin dashboard displays stat cards",
+      "url": "/admin/dashboard",
+      "requires_auth": true,
+      "role": "admin",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".stat-card"
+        },
+        {
+          "type": "element_count",
+          "selector": ".stat-card",
+          "min_count": 5
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Sellers"
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Customers"
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Products"
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Orders"
+        }
+      ]
+    },
+    {
+      "name": "admin_dashboard_quick_actions",
+      "description": "Verify admin dashboard has quick action links",
+      "url": "/admin/dashboard",
+      "requires_auth": true,
+      "role": "admin",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".card-header h2",
+          "text": "Quick Actions"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='sellers']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='categories']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='orders']"
+        }
+      ]
+    }
+  ]
+}
+
