@@ -1,0 +1,92 @@
+{
+  "subtask": "4.5",
+  "name": "Product Listing & Details UI Tests",
+  "description": "Test cases for product listing and details page wireframes",
+  "test_cases": [
+    {
+      "name": "product_listing_page_loads",
+      "description": "Verify product listing page loads and displays correctly",
+      "url": "/products/",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Products"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1",
+          "text": "Products"
+        }
+      ]
+    },
+    {
+      "name": "product_listing_search_filter",
+      "description": "Verify product listing has search and filter controls",
+      "url": "/products/",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "input[name='search']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "select[name='category']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "select[name='sort']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "button[type='submit']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "form[method='GET']"
+        }
+      ]
+    },
+    {
+      "name": "product_listing_grid",
+      "description": "Verify product listing displays products in grid",
+      "url": "/products/",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".product-grid"
+        }
+      ]
+    },
+    {
+      "name": "product_details_page_structure",
+      "description": "Verify product details page has correct structure",
+      "url": "/products/1",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "h1"
+        },
+        {
+          "type": "element_visible",
+          "selector": "img, div[style*='background']"
+        }
+      ]
+    },
+    {
+      "name": "product_details_add_to_cart",
+      "description": "Verify product details page has add to cart form (for customers)",
+      "url": "/products/1",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": "input[name='quantity']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "button[type='submit']"
+        }
+      ]
+    }
+  ]
+}
+
