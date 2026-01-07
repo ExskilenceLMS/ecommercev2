@@ -1,0 +1,14 @@
+{
+  "task_id": "03_1",
+  "task_name": "Task 3 - Subtask 3.1: Define roles & permissions",
+  "description": "RBAC class with role hierarchy and permissions matrix",
+  "mandatory_tests": [
+    {
+      "name": "test_task_3_1_rbac_permissions",
+      "description": "Test RBAC class with roles and permissions",
+      "file": "tests/test_task_3_1_rbac_permissions.py"
+    }
+  ],
+  "optional_tests": []
+}
+
