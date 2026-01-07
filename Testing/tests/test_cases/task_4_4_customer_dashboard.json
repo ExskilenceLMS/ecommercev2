@@ -1,0 +1,78 @@
+{
+  "subtask": "4.4",
+  "name": "Customer Dashboard UI Tests",
+  "description": "Test cases for customer dashboard wireframe",
+  "test_cases": [
+    {
+      "name": "customer_dashboard_loads",
+      "description": "Verify customer dashboard loads and displays correctly",
+      "url": "/customer/dashboard",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "title_contains",
+          "value": "Customer Dashboard"
+        },
+        {
+          "type": "element_visible",
+          "selector": "h1"
+        },
+        {
+          "type": "element_visible",
+          "selector": ".dashboard-stats"
+        }
+      ]
+    },
+    {
+      "name": "customer_dashboard_stat_cards",
+      "description": "Verify customer dashboard displays stat cards",
+      "url": "/customer/dashboard",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".stat-card"
+        },
+        {
+          "type": "element_count",
+          "selector": ".stat-card",
+          "min_count": 2
+        },
+        {
+          "type": "element_contains_text",
+          "selector": ".stat-card",
+          "text": "Orders"
+        }
+      ]
+    },
+    {
+      "name": "customer_dashboard_quick_actions",
+      "description": "Verify customer dashboard has quick action links",
+      "url": "/customer/dashboard",
+      "requires_auth": true,
+      "role": "customer",
+      "assertions": [
+        {
+          "type": "element_visible",
+          "selector": ".card-header h2",
+          "text": "Quick Actions"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='products']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='cart']"
+        },
+        {
+          "type": "element_visible",
+          "selector": "a[href*='orders']"
+        }
+      ]
+    }
+  ]
+}
+
