@@ -1,78 +1,96 @@
 {
-  "subtask": "4.4",
-  "name": "Customer Dashboard UI Tests",
-  "description": "Test cases for customer dashboard wireframe",
-  "test_cases": [
-    {
-      "name": "customer_dashboard_loads",
-      "description": "Verify customer dashboard loads and displays correctly",
-      "url": "/customer/dashboard",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
+  "id": "task4p4",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/customer/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Customer Dashboard"
+          "isMandatory": true,
+          "name": "Customer dashboard loads correctly",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": ".dashboard-stats"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1"
+          "isMandatory": true,
+          "name": "Customer dashboard displays stat cards",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": ".stat-card"},
+            {"type": "count", "selector": ".stat-card", "min": 2}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": ".dashboard-stats"
+          "isMandatory": true,
+          "name": "Customer dashboard has quick action links",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='products']"},
+            {"type": "exists", "selector": "a[href*='cart']"},
+            {"type": "exists", "selector": "a[href*='orders']"}
+          ]
         }
       ]
     },
-    {
-      "name": "customer_dashboard_stat_cards",
-      "description": "Verify customer dashboard displays stat cards",
-      "url": "/customer/dashboard",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".stat-card"
-        },
-        {
-          "type": "element_count",
-          "selector": ".stat-card",
-          "min_count": 2
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Orders"
-        }
-      ]
-    },
-    {
-      "name": "customer_dashboard_quick_actions",
-      "description": "Verify customer dashboard has quick action links",
-      "url": "/customer/dashboard",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".card-header h2",
-          "text": "Quick Actions"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='products']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='cart']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='orders']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-
