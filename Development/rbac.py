@@ -153,3 +153,4 @@ def permission_required(permission):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
