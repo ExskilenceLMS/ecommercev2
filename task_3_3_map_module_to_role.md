@@ -8,8 +8,6 @@ This tells the system which pages and features belong to which roles (Admin, Sel
 By the end of this task you will have:
 - `Development/module_mapping.py` with clear mappings of modules to roles
 - Helper functions to check module access for any user role
-- Tests: `Testing/tests/test_task_3_3_module_mapping.py` 
-- Test config: `Testing/test_configs/task_03_3.json`
 
 This completes Task 3 by connecting your RBAC system (3.1) + decorators (3.2) to the actual Flask blueprint structure you'll build later.
 
