@@ -1,119 +1,146 @@
 {
-  "subtask": "4.6",
-  "name": "Cart & Checkout Flow UI Tests",
-  "description": "Test cases for cart and checkout flow wireframes",
-  "test_cases": [
-    {
-      "name": "cart_page_loads",
-      "description": "Verify cart page loads and displays correctly",
-      "url": "/cart",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
+  "id": "task4p6",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/cart/view.html",
+            "requiredElements": ["h1", "table", "th", "a"]
+          },
+          {
+            "file": "templates/checkout/review.html",
+            "requiredElements": ["h1", "form", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".card-header", "table"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Shopping Cart"
+          "isMandatory": true,
+          "name": "Cart page loads correctly",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": "table"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1",
-          "text": "Shopping Cart"
-        }
-      ]
-    },
-    {
-      "name": "cart_table_structure",
-      "description": "Verify cart page has table structure for items",
-      "url": "/cart",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "table"
+          "isMandatory": true,
+          "name": "Cart page has table structure",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "th"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "th"
-        }
-      ]
-    },
-    {
-      "name": "cart_checkout_button",
-      "description": "Verify cart page has checkout button",
-      "url": "/cart",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "a[href*='checkout']"
-        }
-      ]
-    },
-    {
-      "name": "checkout_review_page_loads",
-      "description": "Verify checkout review page loads and displays correctly",
-      "url": "/checkout/review",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "title_contains",
-          "value": "Checkout"
+          "isMandatory": true,
+          "name": "Cart page has checkout button",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='checkout']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1",
-          "text": "Review Order"
-        }
-      ]
-    },
-    {
-      "name": "checkout_shipping_address",
-      "description": "Verify checkout page has shipping address section",
-      "url": "/checkout/review",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".card-header h2",
-          "text": "Shipping Address"
+          "isMandatory": true,
+          "name": "Checkout review page loads correctly",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "form[method='POST']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "form[method='POST']"
+          "isMandatory": true,
+          "name": "Checkout page has shipping address section",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": ".card-header h2"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Checkout page has place order button",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
         }
       ]
     },
-    {
-      "name": "checkout_order_summary",
-      "description": "Verify checkout page has order summary section",
-      "url": "/checkout/review",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".card-header h2",
-          "text": "Order Summary"
-        }
-      ]
-    },
-    {
-      "name": "checkout_place_order_button",
-      "description": "Verify checkout page has place order button",
-      "url": "/checkout/review",
-      "requires_auth": true,
-      "role": "customer",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "button[type='submit']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-
