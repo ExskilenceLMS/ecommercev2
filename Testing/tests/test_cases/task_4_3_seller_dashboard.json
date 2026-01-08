@@ -1,89 +1,96 @@
 {
-  "subtask": "4.3",
-  "name": "Seller Dashboard UI Tests",
-  "description": "Test cases for seller dashboard wireframe",
-  "test_cases": [
-    {
-      "name": "seller_dashboard_loads",
-      "description": "Verify seller dashboard loads and displays correctly",
-      "url": "/seller/dashboard",
-      "requires_auth": true,
-      "role": "seller",
-      "assertions": [
+  "id": "task4p3",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/seller/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Seller Dashboard"
+          "isMandatory": true,
+          "name": "Seller dashboard loads correctly",
+          "path": "/seller/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "seller"},
+            {"type": "fill", "selector": "input[name='password']", "value": "seller123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/seller/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": ".dashboard-stats"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1",
-          "text": "Seller Dashboard"
+          "isMandatory": true,
+          "name": "Seller dashboard displays stat cards",
+          "path": "/seller/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "seller"},
+            {"type": "fill", "selector": "input[name='password']", "value": "seller123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/seller/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": ".stat-card"},
+            {"type": "count", "selector": ".stat-card", "min": 3}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": ".dashboard-stats"
+          "isMandatory": true,
+          "name": "Seller dashboard has quick action links",
+          "path": "/seller/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "seller"},
+            {"type": "fill", "selector": "input[name='password']", "value": "seller123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/seller/dashboard"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='products']"},
+            {"type": "exists", "selector": "a[href*='inventory']"},
+            {"type": "exists", "selector": "a[href*='orders']"}
+          ]
         }
       ]
     },
-    {
-      "name": "seller_dashboard_stat_cards",
-      "description": "Verify seller dashboard displays stat cards",
-      "url": "/seller/dashboard",
-      "requires_auth": true,
-      "role": "seller",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".stat-card"
-        },
-        {
-          "type": "element_count",
-          "selector": ".stat-card",
-          "min_count": 3
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Products"
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Orders"
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Revenue"
-        }
-      ]
-    },
-    {
-      "name": "seller_dashboard_quick_actions",
-      "description": "Verify seller dashboard has quick action links",
-      "url": "/seller/dashboard",
-      "requires_auth": true,
-      "role": "seller",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".card-header h2",
-          "text": "Quick Actions"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='products']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='inventory']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='orders']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-

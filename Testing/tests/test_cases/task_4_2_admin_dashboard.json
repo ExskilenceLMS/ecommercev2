@@ -1,94 +1,96 @@
 {
-  "subtask": "4.2",
-  "name": "Admin Dashboard UI Tests",
-  "description": "Test cases for admin dashboard wireframe",
-  "test_cases": [
-    {
-      "name": "admin_dashboard_loads",
-      "description": "Verify admin dashboard loads and displays correctly",
-      "url": "/admin/dashboard",
-      "requires_auth": true,
-      "role": "admin",
-      "assertions": [
+  "id": "task4p2",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/admin/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Admin Dashboard"
+          "isMandatory": true,
+          "name": "Admin dashboard loads correctly",
+          "path": "/admin/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": ".dashboard-stats"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1",
-          "text": "Admin Dashboard"
+          "isMandatory": true,
+          "name": "Admin dashboard displays stat cards",
+          "path": "/admin/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": ".stat-card"},
+            {"type": "count", "selector": ".stat-card", "min": 5}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": ".dashboard-stats"
+          "isMandatory": true,
+          "name": "Admin dashboard has quick action links",
+          "path": "/admin/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/dashboard"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='sellers']"},
+            {"type": "exists", "selector": "a[href*='categories']"},
+            {"type": "exists", "selector": "a[href*='orders']"}
+          ]
         }
       ]
     },
-    {
-      "name": "admin_dashboard_stat_cards",
-      "description": "Verify admin dashboard displays stat cards",
-      "url": "/admin/dashboard",
-      "requires_auth": true,
-      "role": "admin",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".stat-card"
-        },
-        {
-          "type": "element_count",
-          "selector": ".stat-card",
-          "min_count": 5
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Sellers"
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Customers"
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Products"
-        },
-        {
-          "type": "element_contains_text",
-          "selector": ".stat-card",
-          "text": "Orders"
-        }
-      ]
-    },
-    {
-      "name": "admin_dashboard_quick_actions",
-      "description": "Verify admin dashboard has quick action links",
-      "url": "/admin/dashboard",
-      "requires_auth": true,
-      "role": "admin",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".card-header h2",
-          "text": "Quick Actions"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='sellers']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='categories']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='orders']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-
