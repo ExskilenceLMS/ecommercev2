@@ -1,132 +1,101 @@
 {
-  "subtask": "4.1",
-  "name": "Login & Registration UI Tests",
-  "description": "Test cases for login and registration page wireframes",
-  "test_cases": [
-    {
-      "name": "login_page_loads",
-      "description": "Verify login page loads and displays correctly",
-      "url": "/auth/login",
-      "assertions": [
+  "id": "task4p1",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/auth/login.html",
+            "requiredElements": ["form", "input", "button"]
+          },
+          {
+            "file": "templates/auth/register.html",
+            "requiredElements": ["form", "input"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".auth-container", ".auth-box", ".btn-primary"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Login"
+          "isMandatory": true,
+          "name": "Login page loads correctly",
+          "path": "/auth/login",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='email']"},
+            {"type": "exists", "selector": "input[name='password']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h2",
-          "text": "Login"
+          "isMandatory": true,
+          "name": "Register page loads correctly",
+          "path": "/auth/register",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='email']"},
+            {"type": "exists", "selector": "input[name='password']"},
+            {"type": "exists", "selector": "input[name='confirm_password']"},
+            {"type": "exists", "selector": "input[name='first_name']"},
+            {"type": "exists", "selector": "input[name='last_name']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "input[name='email']"
+          "isMandatory": true,
+          "name": "Login form structure",
+          "path": "/auth/login",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "exists", "selector": "form[method='POST']"},
+            {"type": "exists", "selector": "label[for='email']"},
+            {"type": "exists", "selector": "label[for='password']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "input[name='password']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "button[type='submit']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "a[href*='register']"
+          "isMandatory": true,
+          "name": "Register form structure",
+          "path": "/auth/register",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "exists", "selector": "form[method='POST']"},
+            {"type": "exists", "selector": "label[for='email']"},
+            {"type": "exists", "selector": "label[for='password']"},
+            {"type": "exists", "selector": "label[for='confirm_password']"}
+          ]
         }
       ]
     },
-    {
-      "name": "register_page_loads",
-      "description": "Verify registration page loads and displays correctly",
-      "url": "/auth/register",
-      "assertions": [
-        {
-          "type": "title_contains",
-          "value": "Register"
-        },
-        {
-          "type": "element_visible",
-          "selector": "h2",
-          "text": "Register"
-        },
-        {
-          "type": "element_visible",
-          "selector": "input[name='email']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "input[name='password']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "input[name='confirm_password']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "input[name='first_name']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "input[name='last_name']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "button[type='submit']"
-        }
-      ]
-    },
-    {
-      "name": "login_form_structure",
-      "description": "Verify login form has correct structure",
-      "url": "/auth/login",
-      "assertions": [
-        {
-          "type": "element_count",
-          "selector": "form",
-          "count": 1
-        },
-        {
-          "type": "element_visible",
-          "selector": "form[method='POST']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "label[for='email']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "label[for='password']"
-        }
-      ]
-    },
-    {
-      "name": "register_form_structure",
-      "description": "Verify registration form has correct structure",
-      "url": "/auth/register",
-      "assertions": [
-        {
-          "type": "element_count",
-          "selector": "form",
-          "count": 1
-        },
-        {
-          "type": "element_visible",
-          "selector": "form[method='POST']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "label[for='email']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "label[for='password']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "label[for='confirm_password']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-
