@@ -1,92 +1,104 @@
 {
-  "subtask": "4.5",
-  "name": "Product Listing & Details UI Tests",
-  "description": "Test cases for product listing and details page wireframes",
-  "test_cases": [
-    {
-      "name": "product_listing_page_loads",
-      "description": "Verify product listing page loads and displays correctly",
-      "url": "/products/",
-      "assertions": [
+  "id": "task4p5",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/product/list.html",
+            "requiredElements": ["h1", "form", "input", "select"]
+          },
+          {
+            "file": "templates/product/details.html",
+            "requiredElements": ["h1", "img", "form", "input", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".product-grid", ".product-card"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
         {
-          "type": "title_contains",
-          "value": "Products"
+          "isMandatory": true,
+          "name": "Product listing page loads correctly",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "input[name='search']"},
+            {"type": "exists", "selector": "select[name='category']"},
+            {"type": "exists", "selector": "select[name='sort']"}
+          ]
         },
         {
-          "type": "element_visible",
-          "selector": "h1",
-          "text": "Products"
+          "isMandatory": true,
+          "name": "Product listing has search and filter controls",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form[method='GET']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product listing displays products in grid",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": ".product-grid"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product details page has correct structure",
+          "path": "/products/1",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "img, div[style*='background']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product details page has add to cart form",
+          "path": "/products/1",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "exists", "selector": "input[name='quantity']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
         }
       ]
     },
-    {
-      "name": "product_listing_search_filter",
-      "description": "Verify product listing has search and filter controls",
-      "url": "/products/",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "input[name='search']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "select[name='category']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "select[name='sort']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "button[type='submit']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "form[method='GET']"
-        }
-      ]
-    },
-    {
-      "name": "product_listing_grid",
-      "description": "Verify product listing displays products in grid",
-      "url": "/products/",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": ".product-grid"
-        }
-      ]
-    },
-    {
-      "name": "product_details_page_structure",
-      "description": "Verify product details page has correct structure",
-      "url": "/products/1",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "h1"
-        },
-        {
-          "type": "element_visible",
-          "selector": "img, div[style*='background']"
-        }
-      ]
-    },
-    {
-      "name": "product_details_add_to_cart",
-      "description": "Verify product details page has add to cart form (for customers)",
-      "url": "/products/1",
-      "assertions": [
-        {
-          "type": "element_visible",
-          "selector": "input[name='quantity']"
-        },
-        {
-          "type": "element_visible",
-          "selector": "button[type='submit']"
-        }
-      ]
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
     }
-  ]
+  }
 }
-
