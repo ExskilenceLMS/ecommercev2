@@ -60,3 +60,46 @@ def load_user(user_id):
 # Set database connection function in utils
 from utils import set_db_connection_func
 set_db_connection_func(get_db_connection)
+
+
+# Import and register blueprints
+from blueprints.auth import auth_bp
+from blueprints.admin import admin_bp
+from blueprints.seller import seller_bp
+from blueprints.customer import customer_bp
+from blueprints.product import product_bp
+from blueprints.cart import cart_bp
+from blueprints.checkout import checkout_bp
+from blueprints.order import order_bp
+from blueprints.payment import payment_bp
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
+app.register_blueprint(seller_bp)
+app.register_blueprint(customer_bp)
+app.register_blueprint(product_bp)
+app.register_blueprint(cart_bp)
+app.register_blueprint(checkout_bp)
+app.register_blueprint(order_bp)
+app.register_blueprint(payment_bp)
+
+# Error handlers
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template('errors/403.html'), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('errors/404.html'), 404
+
+# Main route
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    print("Starting E-Commerce Application")
+    print("Visit: http://localhost:5001")
+    print("Make sure MySQL is running and database is set up")
+    app.run(debug=True, host='0.0.0.0', port=5001)
+
