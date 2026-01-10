@@ -1,0 +1,104 @@
+{
+  "id": "task4p5",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/product/list.html",
+            "requiredElements": ["h1", "form", "input", "select"]
+          },
+          {
+            "file": "templates/product/details.html",
+            "requiredElements": ["h1", "img", "form", "input", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".product-grid", ".product-card"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Product listing page loads correctly",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "input[name='search']"},
+            {"type": "exists", "selector": "select[name='category']"},
+            {"type": "exists", "selector": "select[name='sort']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product listing has search and filter controls",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form[method='GET']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product listing displays products in grid",
+          "path": "/products/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": ".product-grid"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product details page has correct structure",
+          "path": "/products/1",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "img, div[style*='background']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Product details page has add to cart form",
+          "path": "/products/1",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "exists", "selector": "input[name='quantity']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
