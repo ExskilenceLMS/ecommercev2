@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Products - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>My Products</h1>
+        <a href="{{ url_for('seller.create_product') }}" class="btn btn-primary">Add New Product</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>SKU</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product[1] }}</td>
+                    <td>{{ product[6] }}</td>
+                    <td>${{ "%.2f"|format(product[2]) }}</td>
+                    <td>{{ product[3] or 'N/A' }}</td>
+                    <td>{{ product[7] or 0 }}</td>
+                    <td>
+                        <span style="padding: 0.25rem 0.5rem; border-radius: 4px; background: {% if product[4] %}#d1fae5{% else %}#fee2e2{% endif %};">
+                            {% if product[4] %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('seller.edit_product', product_id=product[0]) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
