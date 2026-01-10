@@ -56,3 +56,70 @@ def dashboard():
     }
     
     return render_template('admin/dashboard.html', stats=stats)
+
+
+# Seller management
+@admin_bp.route('/sellers')
+@login_required
+@admin_required
+def sellers():
+    """View all sellers"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT s.id, s.store_name, u.email, u.first_name, u.last_name, 
+               s.contact_email, s.contact_phone, s.created_at
+        FROM sellers s
+        JOIN users u ON s.user_id = u.id
+        ORDER BY s.created_at DESC
+    """)
+    sellers = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/sellers.html', sellers=sellers)
+
+
+@admin_bp.route('/sellers/create', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_seller():
+    """Create new seller"""
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        store_name = request.form.get('store_name')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        contact_email = request.form.get('contact_email')
+        contact_phone = request.form.get('contact_phone')
+        
+        from models.user import User
+        
+        try:
+            # Create user
+            user = User.create(
+                email=email,
+                password=password,
+                role='seller',
+                first_name=first_name,
+                last_name=last_name
+            )
+            
+            # Create seller
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO sellers (user_id, store_name, contact_email, contact_phone)
+                VALUES (%s, %s, %s, %s)
+            """, (user.id, store_name, contact_email, contact_phone))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            flash('Seller created successfully!', 'success')
+            return redirect(url_for('admin.sellers'))
+        except Exception as e:
+            flash(f'Error creating seller: {str(e)}', 'error')
+    
+    return render_template('admin/create_seller.html')
