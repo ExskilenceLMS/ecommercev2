@@ -299,3 +299,82 @@ def update_order_status(order_id):
     
     return redirect(url_for('seller.orders'))
 
+
+# Order list & status
+@seller_bp.route('/orders')
+@login_required
+@seller_required
+def orders():
+    """View seller's orders"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get seller ID
+    cursor.execute("SELECT id FROM sellers WHERE user_id = %s", (current_user.id,))
+    seller = cursor.fetchone()
+    if not seller:
+        flash('Seller profile not found.', 'error')
+        return redirect(url_for('index'))
+    
+    seller_id = seller[0]
+    
+    cursor.execute("""
+        SELECT o.id, o.order_number, o.status, o.total, o.created_at,
+               u.email as customer_email, u.first_name, u.last_name
+        FROM orders o
+        JOIN users u ON o.customer_id = u.id
+        WHERE o.seller_id = %s
+        ORDER BY o.created_at DESC
+    """, (seller_id,))
+    orders = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('seller/orders.html', orders=orders)
+
+
+@seller_bp.route('/orders/<int:order_id>/update-status', methods=['POST'])
+@login_required
+@seller_required
+def update_order_status(order_id):
+    """Update order status"""
+    new_status = request.form.get('status')
+    
+    valid_statuses = ['placed', 'confirmed', 'packed', 'shipped', 'delivered']
+    if new_status not in valid_statuses:
+        flash('Invalid status.', 'error')
+        return redirect(url_for('seller.orders'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Verify seller owns order
+    cursor.execute("SELECT seller_id FROM orders WHERE id = %s", (order_id,))
+    order = cursor.fetchone()
+    
+    if not order:
+        flash('Order not found.', 'error')
+        return redirect(url_for('seller.orders'))
+    
+    cursor.execute("SELECT id FROM sellers WHERE user_id = %s", (current_user.id,))
+    seller = cursor.fetchone()
+    
+    if order[0] != seller[0]:
+        flash('You do not have permission to update this order.', 'error')
+        return redirect(url_for('seller.orders'))
+    
+    try:
+        cursor.execute("""
+            UPDATE orders SET status = %s WHERE id = %s
+        """, (new_status, order_id))
+        conn.commit()
+        flash('Order status updated successfully!', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating order: {str(e)}', 'error')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('seller.orders'))
+
