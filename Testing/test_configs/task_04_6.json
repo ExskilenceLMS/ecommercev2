@@ -1,0 +1,14 @@
+{
+  "task_id": "04_6",
+  "task_name": "Task 4 - Subtask 4.6: Cart & Checkout Flow UI",
+  "description": "Cart and checkout flow wireframes",
+  "mandatory_tests": [
+    {
+      "name": "test_task_4_6_cart_checkout",
+      "description": "Test cart and checkout flow UI",
+      "file": "tests/test_task_4_6_cart_checkout.py"
+    }
+  ],
+  "optional_tests": []
+}
+
