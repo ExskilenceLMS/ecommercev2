@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Seller Dashboard - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Seller Dashboard</h1>
+    </div>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>Products</h3>
+            <div class="value">{{ stats.products }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Orders</h3>
+            <div class="value">{{ stats.orders }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Pending Orders</h3>
+            <div class="value">{{ stats.pending_orders }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Revenue</h3>
+            <div class="value">${{ "%.2f"|format(stats.revenue) }}</div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>Quick Actions</h2>
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('seller.products') }}" class="btn btn-primary">Manage Products</a>
+            <a href="{{ url_for('seller.inventory') }}" class="btn btn-primary">Manage Inventory</a>
+            <a href="{{ url_for('seller.orders') }}" class="btn btn-primary">View Orders</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

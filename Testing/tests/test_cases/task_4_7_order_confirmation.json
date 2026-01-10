@@ -1,0 +1,110 @@
+{
+  "id": "task4p7",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/checkout/confirmation.html",
+            "requiredElements": ["h1", "h2", "p", "a"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".btn-primary", "a"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Order confirmation page loads correctly",
+          "path": "/checkout/confirmation",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/confirmation"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Order confirmation shows success message",
+          "path": "/checkout/confirmation",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/confirmation"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "h1"},
+            {"type": "exists", "selector": "p"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Order confirmation displays order numbers",
+          "path": "/checkout/confirmation",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/confirmation"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "h2"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Order confirmation has action buttons",
+          "path": "/checkout/confirmation",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/confirmation"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='orders']"},
+            {"type": "exists", "selector": "a[href*='products']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
