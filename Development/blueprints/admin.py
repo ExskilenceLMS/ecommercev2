@@ -123,3 +123,28 @@ def create_seller():
             flash(f'Error creating seller: {str(e)}', 'error')
     
     return render_template('admin/create_seller.html')
+
+
+# Order overview page
+@admin_bp.route('/orders')
+@login_required
+@admin_required
+def orders():
+    """View all orders"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT o.id, o.order_number, o.status, o.total, o.created_at,
+               u.email as customer_email, s.store_name
+        FROM orders o
+        JOIN users u ON o.customer_id = u.id
+        JOIN sellers s ON o.seller_id = s.id
+        ORDER BY o.created_at DESC
+        LIMIT 50
+    """)
+    orders = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/orders.html', orders=orders)
+
