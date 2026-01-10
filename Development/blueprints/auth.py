@@ -108,3 +108,13 @@ def register():
             flash(f'Registration failed: {str(e)}', 'error')
     
     return render_template('auth/register.html')
+
+
+# Logout
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    """Logout route"""
+    logout_user()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('index'))
