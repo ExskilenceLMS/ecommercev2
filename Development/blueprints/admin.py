@@ -123,3 +123,61 @@ def create_seller():
             flash(f'Error creating seller: {str(e)}', 'error')
     
     return render_template('admin/create_seller.html')
+
+# Category management
+@admin_bp.route('/categories')
+@login_required
+@admin_required
+def categories():
+    """View all categories"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT c.id, c.name, c.parent_id, p.name as parent_name, c.description, c.slug
+        FROM categories c
+        LEFT JOIN categories p ON c.parent_id = p.id
+        ORDER BY c.parent_id, c.name
+    """)
+    categories = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/categories.html', categories=categories)
+
+
+@admin_bp.route('/categories/create', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_category():
+    """Create new category"""
+    if request.method == 'POST':
+        name = request.form.get('name')
+        parent_id = request.form.get('parent_id') or None
+        description = request.form.get('description')
+        slug = request.form.get('slug') or name.lower().replace(' ', '-')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO categories (name, parent_id, description, slug)
+                VALUES (%s, %s, %s, %s)
+            """, (name, parent_id, description, slug))
+            conn.commit()
+            flash('Category created successfully!', 'success')
+            return redirect(url_for('admin.categories'))
+        except Exception as e:
+            flash(f'Error creating category: {str(e)}', 'error')
+        finally:
+            cursor.close()
+            conn.close()
+    
+    # Get parent categories for dropdown
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name FROM categories WHERE parent_id IS NULL")
+    parent_categories = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/create_category.html', parent_categories=parent_categories)
