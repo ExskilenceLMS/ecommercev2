@@ -1,0 +1,13 @@
+{
+  "task_id": "02",
+  "task_name": "Database Design",
+  "description": "Entity identification, relationship mapping, normalization, ER Diagram, MySQL schema",
+  "mandatory_tests": [
+    {
+      "name": "test_database_schema",
+      "description": "Test database schema validation",
+      "file": "tests/test_database_schema.py"
+    }
+  ],
+  "optional_tests": []
+}
