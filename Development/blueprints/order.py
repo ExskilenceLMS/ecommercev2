@@ -68,8 +68,28 @@ def list():
     cursor = conn.cursor()
 
     # Role Based access
-    
-    cursor.execute("""
+    # Seller order view
+    if current_user.role == 'seller':
+        # Seller sees their orders
+        cursor.execute("SELECT id FROM sellers WHERE user_id = %s", (current_user.id,))
+        seller = cursor.fetchone()
+        if seller:
+            cursor.execute("""
+                SELECT o.id, o.order_number, o.status, o.total, o.created_at,
+                       u.email as customer_email, u.first_name, u.last_name
+                FROM orders o
+                JOIN users u ON o.customer_id = u.id
+                WHERE o.seller_id = %s
+                ORDER BY o.created_at DESC
+            """, (seller[0],))
+        else:
+            cursor.close()
+            conn.close()
+            flash('Seller profile not found.', 'error')
+            return redirect(url_for('index'))
+        
+    else:
+        cursor.execute("""
             SELECT o.id, o.order_number, o.status, o.total, o.created_at, s.store_name
             FROM orders o
             JOIN sellers s ON o.seller_id = s.id
