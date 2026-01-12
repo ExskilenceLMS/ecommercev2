@@ -196,3 +196,38 @@ def clear():
     flash('Cart cleared.', 'success')
     return redirect(url_for('cart.view'))
 
+
+# Cart summary page
+@cart_bp.route('/')
+@login_required
+@customer_required
+def view():
+    """View cart"""
+    cart_id = get_or_create_cart()
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT ci.id, ci.product_id, ci.quantity, p.name, p.price, p.image_url, 
+               p.sku, i.quantity as stock_quantity
+        FROM cart_items ci
+        JOIN products p ON ci.product_id = p.id
+        LEFT JOIN inventory i ON p.id = i.product_id
+        WHERE ci.cart_id = %s
+    """, (cart_id,))
+    cart_items = cursor.fetchall()
+    
+    # Calculate totals
+    subtotal = sum(float(item[4]) * item[2] for item in cart_items)
+    tax = subtotal * 0.10  # 10% tax
+    total = subtotal + tax
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('cart/view.html', 
+                         cart_items=cart_items,
+                         subtotal=subtotal,
+                         tax=tax,
+                         total=total)
