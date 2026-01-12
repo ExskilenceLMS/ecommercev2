@@ -1,0 +1,14 @@
+{
+  "task_id": "04_7",
+  "task_name": "Task 4 - Subtask 4.7: Order Confirmation Page UI",
+  "description": "Order confirmation page wireframe",
+  "mandatory_tests": [
+    {
+      "name": "test_task_4_7_order_confirmation",
+      "description": "Test order confirmation page UI",
+      "file": "tests/test_task_4_7_order_confirmation.py"
+    }
+  ],
+  "optional_tests": []
+}
+
