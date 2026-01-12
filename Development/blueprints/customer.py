@@ -162,3 +162,41 @@ def orders():
     conn.close()
     
     return render_template('customer/orders.html', orders=orders)
+
+
+# Order details page
+@customer_bp.route('/orders/<int:order_id>')
+@login_required
+@customer_required
+def order_details(order_id):
+    """View order details"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get order
+    cursor.execute("""
+        SELECT o.*, s.store_name, a.address_line1, a.address_line2, a.city, a.state, a.postal_code
+        FROM orders o
+        JOIN sellers s ON o.seller_id = s.id
+        JOIN addresses a ON o.shipping_address_id = a.id
+        WHERE o.id = %s AND o.customer_id = %s
+    """, (order_id, current_user.id))
+    order = cursor.fetchone()
+    
+    if not order:
+        flash('Order not found.', 'error')
+        return redirect(url_for('customer.orders'))
+    
+    # Get order items
+    cursor.execute("""
+        SELECT oi.*, p.name as product_name, p.image_url
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = %s
+    """, (order_id,))
+    order_items = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('customer/order_details.html', order=order, order_items=order_items)
