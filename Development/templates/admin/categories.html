@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Manage Categories</h1>
+        <a href="{{ url_for('admin.create_category') }}" class="btn btn-primary">Create New Category</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Parent Category</th>
+                    <th>Description</th>
+                    <th>Slug</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categories %}
+                <tr>
+                    <td>{{ cat[1] }}</td>
+                    <td>{{ cat[3] or 'None' }}</td>
+                    <td>{{ cat[4] or 'N/A' }}</td>
+                    <td>{{ cat[5] }}</td>
+                    <td>
+                        <a href="#" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
