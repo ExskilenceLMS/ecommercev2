@@ -111,3 +111,45 @@ def list():
                              search_query='',
                              sort_by='newest')
 
+# Product details page
+@product_bp.route('/<int:product_id>')
+def details(product_id):
+    """Product details page"""
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            flash('Database connection failed. Please check your database configuration.', 'error')
+            return redirect(url_for('product.list'))
+        
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT p.*, c.name as category_name, s.store_name, s.id as seller_id,
+                   i.quantity, i.low_stock_threshold
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            JOIN sellers s ON p.seller_id = s.id
+            LEFT JOIN inventory i ON p.id = i.product_id
+            WHERE p.id = %s AND p.is_active = TRUE
+        """, (product_id,))
+        product = cursor.fetchone()
+        
+        cursor.close()
+        if conn:
+            conn.close()
+        
+        if not product:
+            flash('Product not found.', 'error')
+            return redirect(url_for('product.list'))
+        
+        return render_template('product/details.html', product=product)
+    except Exception as e:
+        flash(f'Error loading product: {str(e)}', 'error')
+        return redirect(url_for('product.list'))
+
+
+@product_bp.route('/category/<int:category_id>')
+def by_category(category_id):
+    """View products by category"""
+    return list()
+
