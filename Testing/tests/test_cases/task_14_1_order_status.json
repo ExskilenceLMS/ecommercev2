@@ -1,0 +1,56 @@
+{
+  "id": "task14p2",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/order/details.html",
+            "requiredElements": [
+              "form",
+              "select",
+              "button"
+            ]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Task 14 2 Order Status test",
+          "path": "/orders/1/update-status",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {
+              "type": "url",
+              "value": "/orders/1/update-status"
+            }
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
