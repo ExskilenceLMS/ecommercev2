@@ -1,0 +1,96 @@
+{
+  "id": "task4p4",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/customer/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Customer dashboard loads correctly",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": ".dashboard-stats"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Customer dashboard displays stat cards",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": ".stat-card"},
+            {"type": "count", "selector": ".stat-card", "min": 2}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Customer dashboard has quick action links",
+          "path": "/customer/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/customer/dashboard"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='products']"},
+            {"type": "exists", "selector": "a[href*='cart']"},
+            {"type": "exists", "selector": "a[href*='orders']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
