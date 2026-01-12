@@ -22,6 +22,12 @@ def generate_transaction_id():
     return 'TXN-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
 
 
+# Invoice number generation
+def generate_invoice_number():
+    """Generate unique invoice number"""
+    return 'INV-' + datetime.now().strftime('%Y%m%d') + '-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+
 # Mock payment gateway integration
 @payment_bp.route('/process/<int:order_id>', methods=['GET', 'POST'])
 @login_required
@@ -64,7 +70,7 @@ def process(order_id):
         # In real application, this would integrate with payment gateway
         payment_status = 'completed'  # Mock: always succeeds
         transaction_id = generate_transaction_id()
-        invoice_number = "" # we'll genrate in task 15.4
+        invoice_number = generate_invoice_number()
         
         try:
             # Subtask 15.3: Link payment to orders
@@ -132,3 +138,46 @@ def success(order_id):
         return redirect(url_for('customer.orders'))
     
     return render_template('payment/success.html', payment=payment)
+
+
+# Invoice number generation (continued)
+@payment_bp.route('/invoice/<int:order_id>')
+@login_required
+@customer_required
+def invoice(order_id):
+    """Generate invoice"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get order with payment
+    cursor.execute("""
+        SELECT o.*, p.invoice_number, p.payment_method, p.transaction_id, p.payment_date,
+               u.first_name, u.last_name, u.email,
+               s.store_name, s.contact_email,
+               a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country
+        FROM orders o
+        JOIN users u ON o.customer_id = u.id
+        JOIN sellers s ON o.seller_id = s.id
+        JOIN addresses a ON o.shipping_address_id = a.id
+        LEFT JOIN payments p ON o.id = p.order_id
+        WHERE o.id = %s AND o.customer_id = %s
+    """, (order_id, current_user.id))
+    order = cursor.fetchone()
+    
+    if not order:
+        flash('Order not found.', 'error')
+        return redirect(url_for('customer.orders'))
+    
+    # Get order items
+    cursor.execute("""
+        SELECT oi.*, p.name as product_name, p.sku
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = %s
+    """, (order_id,))
+    order_items = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('payment/invoice.html', order=order, order_items=order_items)
