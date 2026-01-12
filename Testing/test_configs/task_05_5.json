@@ -1,0 +1,14 @@
+{
+  "task_id": "05_5",
+  "task_name": "Task 5 - Subtask 5.5: Blueprint Structure",
+  "description": "Blueprint structure and registration",
+  "mandatory_tests": [
+    {
+      "name": "test_task_5_5_blueprint_structure",
+      "description": "Test blueprint structure",
+      "file": "tests/test_task_5_5_blueprint_structure.py"
+    }
+  ],
+  "optional_tests": []
+}
+
