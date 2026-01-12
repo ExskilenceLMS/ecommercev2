@@ -140,3 +140,25 @@ def create_address():
             conn.close()
     
     return render_template('customer/create_address.html')
+
+
+# Order history
+@customer_bp.route('/orders')
+@login_required
+@customer_required
+def orders():
+    """View customer order history"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT o.id, o.order_number, o.status, o.total, o.created_at, s.store_name
+        FROM orders o
+        JOIN sellers s ON o.seller_id = s.id
+        WHERE o.customer_id = %s
+        ORDER BY o.created_at DESC
+    """, (current_user.id,))
+    orders = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('customer/orders.html', orders=orders)
