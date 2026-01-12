@@ -1,0 +1,14 @@
+{
+  "task_id": "04_5",
+  "task_name": "Task 4 - Subtask 4.5: Product Listing & Details UI",
+  "description": "Product listing and details page wireframes",
+  "mandatory_tests": [
+    {
+      "name": "test_task_4_5_product_listing_details",
+      "description": "Test product listing and details UI",
+      "file": "tests/test_task_4_5_product_listing_details.py"
+    }
+  ],
+  "optional_tests": []
+}
+
