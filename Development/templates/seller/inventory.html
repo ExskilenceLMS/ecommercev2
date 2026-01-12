@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Management - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Inventory Management</h1>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>SKU</th>
+                    <th>Current Stock</th>
+                    <th>Low Stock Threshold</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory_items %}
+                <tr>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] or 'N/A' }}</td>
+                    <td>
+                        <span style="color: {% if item[3] <= (item[4] or 0) %}#ef4444{% elif item[3] <= ((item[4] or 0) * 2) %}#f59e0b{% else %}#10b981{% endif %};">
+                            {{ item[3] }}
+                        </span>
+                    </td>
+                    <td>{{ item[4] or 'N/A' }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('seller.update_inventory', product_id=item[0]) }}" style="display: inline;">
+                            <input type="number" name="quantity" value="{{ item[3] }}" min="0" style="width: 80px; padding: 0.25rem;">
+                            <button type="submit" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
