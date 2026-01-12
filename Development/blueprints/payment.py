@@ -105,11 +105,6 @@ def process(order_id):
     conn.close()
     
     return render_template('payment/process.html', order=order, existing_payment=existing_payment)
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('payment/process.html', order=order, existing_payment=existing_payment)
 
 
 # Payment success & failure handling
