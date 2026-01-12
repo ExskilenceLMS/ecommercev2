@@ -69,3 +69,30 @@ def process(order_id):
     conn.close()
     
     return render_template('payment/process.html', order=order, existing_payment=existing_payment)
+
+
+# Payment success & failure handling
+@payment_bp.route('/success/<int:order_id>')
+@login_required
+@customer_required
+def success(order_id):
+    """Payment success page"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT p.*, o.order_number, o.total
+        FROM payments p
+        JOIN orders o ON p.order_id = o.id
+        WHERE p.order_id = %s AND o.customer_id = %s
+    """, (order_id, current_user.id))
+    payment = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    if not payment:
+        flash('Payment not found.', 'error')
+        return redirect(url_for('customer.orders'))
+    
+    return render_template('payment/success.html', payment=payment)
