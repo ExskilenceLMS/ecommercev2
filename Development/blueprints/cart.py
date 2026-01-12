@@ -149,3 +149,50 @@ def update(item_id):
     
     flash('Cart updated!', 'success')
     return redirect(url_for('cart.view'))
+
+# Remove item from cart
+@cart_bp.route('/remove/<int:item_id>', methods=['POST'])
+@login_required
+@customer_required
+def remove(item_id):
+    """Remove item from cart"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Verify item belongs to user's cart
+    cursor.execute("""
+        SELECT ci.id FROM cart_items ci
+        JOIN cart c ON ci.cart_id = c.id
+        WHERE ci.id = %s AND c.customer_id = %s
+    """, (item_id, current_user.id))
+    item = cursor.fetchone()
+    
+    if item:
+        cursor.execute("DELETE FROM cart_items WHERE id = %s", (item_id,))
+        conn.commit()
+        flash('Item removed from cart.', 'success')
+    else:
+        flash('Cart item not found.', 'error')
+    
+    cursor.close()
+    conn.close()
+    return redirect(url_for('cart.view'))
+
+
+@cart_bp.route('/clear', methods=['POST'])
+@login_required
+@customer_required
+def clear():
+    """Clear entire cart"""
+    cart_id = get_or_create_cart()
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cart_items WHERE cart_id = %s", (cart_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    flash('Cart cleared.', 'success')
+    return redirect(url_for('cart.view'))
+
