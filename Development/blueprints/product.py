@@ -1,73 +1,113 @@
 import sys
 from pathlib import Path
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
-from datetime import datetime
-import random
-import string
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+import math
 
-# Add project root to path
-project_root = Path(__file__).parent.parent.parent.parent.parent.parent
+# Add Development directory to path
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from decorators import customer_required
 from utils import get_db_connection
 
-payment_bp = Blueprint('payment', __name__, url_prefix='/payment')
+product_bp = Blueprint('product', __name__, url_prefix='/products')
 
 
-# Mock payment gateway integration
-
-def generate_transaction_id():
-    """Generate mock transaction ID"""
-    return 'TXN-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
-
-
-@payment_bp.route('/process/<int:order_id>', methods=['GET', 'POST'])
-@login_required
-@customer_required
-def process(order_id):
-    """Process payment for order"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
+# Product listing page (with category filter, search, and pagination)
+@product_bp.route('/')
+def list():
+    """Product listing page with search and filters"""
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+    category_id = request.args.get('category', type=int)
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort', 'newest')  # newest, price_low, price_high, name
     
-    # Get order
-    cursor.execute("""
-        SELECT o.id, o.order_number, o.total, o.status
-        FROM orders o
-        WHERE o.id = %s AND o.customer_id = %s
-    """, (order_id, current_user.id))
-    order = cursor.fetchone()
-    
-    if not order:
-        flash('Order not found.', 'error')
-        return redirect(url_for('customer.orders'))
-    
-    if order[3] != 'placed':  # status
-        flash('Order has already been processed.', 'error')
-        return redirect(url_for('order.details', order_id=order_id))
-    
-    # Check if payment already exists
-    cursor.execute("""
-        SELECT id, status FROM payments WHERE order_id = %s
-    """, (order_id,))
-    existing_payment = cursor.fetchone()
-    
-    if request.method == 'POST':
-        payment_method = request.form.get('payment_method')
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            flash('Database connection failed. Please check your database configuration.', 'error')
+            return render_template('product/list.html', 
+                                 products=[],
+                                 categories=[],
+                                 current_page=1,
+                                 total_pages=0,
+                                 category_id=None,
+                                 search_query='',
+                                 sort_by='newest')
         
-        if not payment_method:
-            flash('Please select a payment method.', 'error')
-            return render_template('payment/process.html', order=order, existing_payment=existing_payment)
+        cursor = conn.cursor()
         
-        # Mock payment processing
-        # In real application, this would integrate with payment gateway
-        payment_status = 'completed'  # Mock: always succeeds
-        transaction_id = generate_transaction_id()
+        # Build query
+        query = """
+            SELECT p.id, p.name, p.description, p.price, p.image_url, p.sku,
+                   c.name as category_name, s.store_name, i.quantity
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            JOIN sellers s ON p.seller_id = s.id
+            LEFT JOIN inventory i ON p.id = i.product_id
+            WHERE p.is_active = TRUE AND (i.quantity > 0 OR i.quantity IS NULL)
+        """
+        params = []
+        
+        if category_id:
+            query += " AND p.category_id = %s"
+            params.append(category_id)
+        
+        if search_query:
+            query += " AND (p.name LIKE %s OR p.description LIKE %s)"
+            params.extend([f'%{search_query}%', f'%{search_query}%'])
+        
+        # Sorting
+        if sort_by == 'price_low':
+            query += " ORDER BY p.price ASC"
+        elif sort_by == 'price_high':
+            query += " ORDER BY p.price DESC"
+        elif sort_by == 'name':
+            query += " ORDER BY p.name ASC"
+        else:  # newest
+            query += " ORDER BY p.created_at DESC"
+        
+        # Get total count
+        count_query = query.replace(
+            "SELECT p.id, p.name, p.description, p.price, p.image_url, p.sku, c.name as category_name, s.store_name, i.quantity",
+            "SELECT COUNT(*)"
+        )
+        cursor.execute(count_query, params)
+        count_result = cursor.fetchone()
+        total = count_result[0] if count_result else 0
+        
+        # Get paginated results
+        query += " LIMIT %s OFFSET %s"
+        params.extend([per_page, (page - 1) * per_page])
+        cursor.execute(query, params)
+        products = cursor.fetchall()
+        
+        # Get categories for filter
+        cursor.execute("SELECT id, name FROM categories WHERE parent_id IS NULL ORDER BY name")
+        categories = cursor.fetchall()
+        
+        cursor.close()
+        if conn:
+            conn.close()
+        
+        total_pages = math.ceil(total / per_page) if total > 0 else 0
+        
+        return render_template('product/list.html', 
+                             products=products,
+                             categories=categories,
+                             current_page=page,
+                             total_pages=total_pages,
+                             category_id=category_id,
+                             search_query=search_query,
+                             sort_by=sort_by)
+    except Exception as e:
+        flash(f'Error loading products: {str(e)}', 'error')
+        return render_template('product/list.html', 
+                             products=[],
+                             categories=[],
+                             current_page=1,
+                             total_pages=0,
+                             category_id=None,
+                             search_query='',
+                             sort_by='newest')
 
-        # continue in task 11.3
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('payment/process.html', order=order, existing_payment=existing_payment)
