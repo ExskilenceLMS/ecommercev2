@@ -1,0 +1,64 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual Environments ---
+venv/
+env/
+ENV/
+.env
+.venv/
+
+# --- Flask ---
+instance/
+.webassets-cache
+
+# --- Pytest ---
+.cache
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# --- Playwright ---
+# binaries and browsers are usually installed globally or in cache, 
+# but if you have local installs:
+/ms-playwright/
+
+# Test results, screenshots, and videos generated during runs
+test-results/
+playwright-report/
+blob-report/
+.playwright-artifacts/
+
+# --- IDEs & OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
