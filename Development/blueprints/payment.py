@@ -64,6 +64,47 @@ def process(order_id):
         # In real application, this would integrate with payment gateway
         payment_status = 'completed'  # Mock: always succeeds
         transaction_id = generate_transaction_id()
+        invoice_number = "" # we'll genrate in task 15.4
+        
+        try:
+            # Subtask 15.3: Link payment to orders
+            if existing_payment:
+                # Update existing payment
+                cursor.execute("""
+                    UPDATE payments
+                    SET payment_method = %s, status = %s, transaction_id = %s,
+                        invoice_number = %s, payment_date = NOW()
+                    WHERE order_id = %s
+                """, (payment_method, payment_status, transaction_id, invoice_number, order_id))
+            else:
+                # Create new payment
+                cursor.execute("""
+                    INSERT INTO payments (order_id, amount, payment_method, status, transaction_id, invoice_number, payment_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                """, (order_id, order[2], payment_method, payment_status, transaction_id, invoice_number))
+            
+            # Update order status to confirmed
+            cursor.execute("""
+                UPDATE orders SET status = 'confirmed' WHERE id = %s
+            """, (order_id,))
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            flash('Payment processed successfully!', 'success')
+            return redirect(url_for('payment.success', order_id=order_id))
+            
+        except Exception as e:
+            conn.rollback()
+            cursor.close()
+            conn.close()
+            flash(f'Payment processing failed: {str(e)}', 'error')
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('payment/process.html', order=order, existing_payment=existing_payment)
     
     cursor.close()
     conn.close()
