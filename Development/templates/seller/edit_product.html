@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Edit Product</h1>
+    </div>
+    
+    <div class="card" style="max-width: 600px;">
+        <form method="POST" action="{{ url_for('seller.edit_product', product_id=product[0]) }}">
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input type="text" id="name" name="name" value="{{ product[2] }}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4">{{ product[3] or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="category_id">Category</label>
+                <select id="category_id" name="category_id" required>
+                    <option value="">Select Category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat[0] }}" {% if product[5] == cat[0] %}selected{% endif %}>{{ cat[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" value="{{ product[4] }}" required>
+            </div>
+            <div class="form-group">
+                <label for="sku">SKU</label>
+                <input type="text" id="sku" name="sku" value="{{ product[6] or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Stock Quantity</label>
+                <input type="number" id="quantity" name="quantity" min="0" value="{{ product[8] or 0 }}" required>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_active" {% if product[7] %}checked{% endif %}>
+                    Active
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Product</button>
+            <a href="{{ url_for('seller.products') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

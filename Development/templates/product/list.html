@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Products - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Products</h1>
+    </div>
+    
+    <div class="card">
+        <form method="GET" action="{{ url_for('product.list') }}" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <input type="text" name="search" placeholder="Search products..." value="{{ search_query }}" style="flex: 1;">
+            <select name="category" style="padding: 0.5rem;">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat[0] }}" {% if category_id == cat[0] %}selected{% endif %}>{{ cat[1] }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort" style="padding: 0.5rem;">
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+    
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            {% if product[5] %}
+            <img src="{{ product[5] }}" alt="{{ product[1] }}" class="product-image">
+            {% else %}
+            <div class="product-image" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>
+            {% endif %}
+            <div class="product-info">
+                <div class="product-name">{{ product[1] }}</div>
+                <div class="product-price">${{ "%.2f"|format(product[3]) }}</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">{{ product[6] }} - {{ product[7] }}</p>
+                <div class="product-actions">
+                    <a href="{{ url_for('product.details', product_id=product[0]) }}" class="btn btn-primary" style="flex: 1;">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if total_pages > 1 %}
+    <div style="text-align: center; margin-top: 2rem;">
+        {% if current_page > 1 %}
+        <a href="{{ url_for('product.list', page=current_page-1, category=category_id, search=search_query, sort=sort_by) }}" class="btn btn-secondary">Previous</a>
+        {% endif %}
+        <span style="margin: 0 1rem;">Page {{ current_page }} of {{ total_pages }}</span>
+        {% if current_page < total_pages %}
+        <a href="{{ url_for('product.list', page=current_page+1, category=category_id, search=search_query, sort=sort_by) }}" class="btn btn-secondary">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
