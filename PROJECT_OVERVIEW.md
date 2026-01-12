@@ -1,169 +1,218 @@
-# 🛒 E-Commerce Project (Multi-Vendor Platform)
+# 🛒 Multi-Vendor E-Commerce Platform (Flask + MySQL)
 
-## 📌 Project Overview
-This project is a fully functional Multi-Vendor E-Commerce platform designed to facilitate online trading between multiple sellers and customers. The system is built to mimic real-world "Digital Shopping Mall" operations where an Administrator manages the infrastructure, Sellers manage their individual shops/products, and Customers browse and purchase items.
+## 📌 Overview
 
-The goal is to understand the complete lifecycle of an e-commerce transaction, from product listing to order fulfillment, while implementing Role-Based Access Control (RBAC).
+This project is a **Multi-Vendor E-Commerce Web Application** where multiple sellers can list and manage products, and customers can browse, purchase, and track orders through a single online marketplace.  
+A platform administrator manages seller onboarding, product categories, platform settings, and system monitoring.
 
----
-
-## 🛠️ Tech Stack
-* **Language:** Python
-* **Web Framework:** Flask
-* **Templating Engine:** Jinja2
-* **Database:** MySQL
-* **Modules:** Product, Category, Inventory, Cart, Order, Payment
+The application simulates a real-world **online marketplace (e.g., eBay/Amazon-style)** and demonstrates the complete e-commerce transaction lifecycle using **Role-Based Access Control (RBAC)**.
 
 ---
 
-## 🔷 Phase 1: System Understanding & Design
-### 🔹 Part 1: Requirement Analysis — Roles & Features
+## 🚀 Key Features
 
-The system is divided into three distinct user roles. Below is a detailed breakdown of the features and responsibilities for each role.
-
----
-
-### 1️⃣ Role: Admin (Platform Owner)
-**Concept:** The Admin is the "Mall Owner." They do not sell products but own the building, set the rules, and ensure security.
-
-#### 📋 Features & Responsibilities
-* **Login & Logout (Security Guard):**
-    * *What:* A secure entry point restricted to authorized administrators only.
-    * *Why:* To protect sensitive business data and platform settings from unauthorized access.
-* **Create / Manage Sellers (Leasing Office):**
-    * *What:* The Admin is the only one who can create accounts for Sellers.
-    * *Why:* This vetting process prevents scammers from joining the platform. It ensures only verified vendors can sell.
-* **Create Categories & Subcategories (Mall Signage):**
-    * *What:* Defining the organization structure (e.g., Electronics > Laptops).
-    * *Why:* Sellers cannot create their own categories. This prevents chaos (e.g., one seller using "Cellphones" and another "Mobiles") and keeps the catalog standardized.
-* **View All Products & Orders (Surveillance):**
-    * *What:* A master view of every product and every order across the entire platform.
-    * *Why:* Necessary for dispute resolution (e.g., if a customer claims a seller never shipped an item) and general oversight.
-* **Manage Platform-level Settings (Building Maintenance):**
-    * *What:* Controlling global variables like the Website Name, Logo, Tax Rates, or Shipping Policies.
-* **View Sales Reports (Business Analytics):**
-    * *What:* High-level charts showing total revenue and growth.
-    * *Why:* To track the health and success of the entire business.
-
-#### ❓ Admin Role MCQs
-1.  **Who acts as the "Mall Owner" deciding who is allowed to sell products?**
-    * [ ] Customer
-    * [x] Admin
-    * [ ] Seller
-    * [ ] Guest
-2.  **Why doesn't the Admin allow Sellers to create their own Categories?**
-    * [x] To keep the catalog organized and standardized.
-    * [ ] Because Sellers don't know how to type.
-    * [ ] To charge extra money for categories.
-    * [ ] Categories are not important.
-3.  **What is the purpose of the Admin viewing "All Orders"?**
-    * [ ] To buy the items for themselves.
-    * [ ] To delete successful orders.
-    * [x] To oversee platform activity and resolve disputes.
-    * [ ] To pack the products.
-4.  **If a new Tax Law is passed, who updates the tax percentage in "Platform Settings"?**
-    * [ ] Every Customer individually
-    * [ ] The Seller
-    * [x] The Admin
-    * [ ] The Courier Service
-5.  **Which feature ensures that only the Mall Owner can access sensitive settings?**
-    * [ ] View Sales Reports
-    * [ ] Create Categories
-    * [x] Login (Authentication)
-    * [ ] Add to Cart
+- Multi-vendor marketplace architecture  
+- Role-based access control (Admin, Seller, Customer)  
+- Secure authentication & authorization  
+- Product catalog & category management  
+- Inventory control with overselling prevention  
+- Shopping cart & checkout system  
+- Order tracking & status management  
+- Platform-level analytics and reporting  
 
 ---
 
-### 2️⃣ Role: Seller / Store Staff (Shopkeeper)
-**Concept:** The Seller rents a shop within the mall. They focus only on their own products and sales.
+## 🛠️ Technology Stack
 
-#### 📋 Features & Responsibilities
-* **Login (Shop Key):**
-    * *What:* Authenticates the user and redirects them specifically to the "Seller Dashboard."
-* **Add / Update Products (Stocking Shelves):**
-    * *What:* Uploading product names, descriptions, prices, and images.
-    * *Why:* Without this data input, the "shelves" of the website would be empty.
-* **Manage Inventory / Stock (Warehouse Check):**
-    * *What:* Updating the quantity of items available (e.g., "I have 5 red shirts left").
-    * *Why:* Critical to prevent **Overselling**. If stock hits 0, the system must stop customers from buying that item.
-* **View Received Orders (Order Pad):**
-    * *What:* A list of items that customers have purchased specifically from this seller.
-    * *Why:* Functions as a "To-Do List" so the seller knows what to pack.
-* **Update Order Status (Communication):**
-    * *What:* Changing the status of an order (Pending → Packed → Shipped).
-    * *Why:* Keeps the customer informed. It prevents customers from calling support to ask, "Where is my package?"
-
-#### ❓ Seller Role MCQs
-1.  **What is the "To-Do List" for a Seller?**
-    * [ ] Manage Platform Settings
-    * [x] View Received Orders
-    * [ ] Browse Products
-    * [ ] Register
-2.  **Why is "Manage Inventory" critical?**
-    * [ ] It changes the color of the website.
-    * [x] It prevents selling items that don't exist (Overselling).
-    * [ ] It allows the Admin to spy on the seller.
-    * [ ] It deletes old products.
-3.  **When a Seller logs in, why can't they see another Seller's orders?**
-    * [x] The system filters data to show only their own records.
-    * [ ] They are not wearing glasses.
-    * [ ] The other seller blocked them.
-    * [ ] The Admin forgot to turn on that feature.
-4.  **Who is responsible for taking a photo of the product and uploading it?**
-    * [ ] The Customer
-    * [ ] The Admin
-    * [x] The Seller
-    * [ ] The Bank
-5.  **Which status update indicates the package has left the Seller's warehouse?**
-    * [ ] Pending
-    * [ ] Cancelled
-    * [x] Shipped
-    * [ ] Viewed
+- **Backend:** Python (Flask)
+- **Frontend:** HTML, CSS, Bootstrap, Jinja2
+- **Database:** MySQL
+- **Architecture:** MVC (Model–View–Controller)
+- **Authentication:** Session-based authentication
 
 ---
 
-### 3️⃣ Role: Customer (The Shopper)
-**Concept:** The End-User who browses the aisles and purchases items.
+## 🔐 User Roles & Responsibilities
 
-#### 📋 Features & Responsibilities
-* **Register & Login (Membership Card):**
-    * *What:* Creating a secure account.
-    * *Why:* Essential for saving shipping addresses (convenience) and maintaining an Order History (tracking purchases).
-* **Browse Products & Categories (Window Shopping):**
-    * *What:* Using search bars and filters to find specific items (e.g., "Sneakers" or "Kitchenware").
-* **Add Products to Cart (Shopping Basket):**
-    * *What:* A temporary holding area for items.
-    * *Why:* Allows the user to select multiple items before making a final payment decision. Items here are not yet "sold."
-* **Place Orders (Checkout Counter):**
-    * *What:* The final transaction.
-    * *Why:* This complex step involves checking stock, deducting money, reducing inventory, and generating a receipt (Order ID).
-* **View Order History (Receipt Book):**
-    * *What:* A dashboard showing past purchases and current status.
-    * *Why:* Allows the customer to track if their item has been "Shipped" or "Delivered."
+### 1️⃣ Admin (Platform Administrator)
 
-#### ❓ Customer Role MCQs
-1.  **Which feature represents the "Checkout Counter" experience?**
-    * [ ] Add to Cart
-    * [x] Place Orders
-    * [ ] Login
-    * [ ] View History
-2.  **What is the "Cart" used for?**
-    * [ ] To permanently store items you bought.
-    * [x] To hold items temporarily before you decide to pay.
-    * [ ] To send items to the Admin.
-    * [ ] To write reviews.
-3.  **Why does a Customer need to "Register"?**
-    * [ ] To become a Seller.
-    * [x] To link their address and past orders to a secure account.
-    * [ ] To change the price of products.
-    * [ ] To see the Admin Dashboard.
-4.  **How does a Customer find a specific type of product (e.g., "Watches")?**
-    * [x] By using "Browse Categories" or Search.
-    * [ ] By emailing the Seller.
-    * [ ] By using "Manage Inventory".
-    * [ ] By logging out.
-5.  **If a Customer wants to see if their order has been "Shipped", where do they look?**
-    * [ ] In the Cart.
-    * [ ] On the Seller's profile.
-    * [x] In "View Order History".
-    * [ ] They cannot check.
+**Description:**  
+Manages the overall marketplace infrastructure and ensures security, standardization, and compliance.
+
+**Responsibilities:**
+- Secure admin authentication
+- Create and manage seller accounts
+- Define product categories and subcategories
+- View all products and all orders
+- Manage platform-level settings (tax, branding, policies)
+- Access sales and performance reports
+
+---
+
+### 2️⃣ Seller (Vendor)
+
+**Description:**  
+Independent sellers who list products and manage orders within the platform.
+
+**Responsibilities:**
+- Seller authentication and dashboard access
+- Create, update, and remove product listings
+- Manage product inventory
+- View orders related to their products
+- Update order status (Pending → Shipped)
+
+---
+
+### 3️⃣ Customer (Buyer)
+
+**Description:**  
+End-users who browse the marketplace, place orders, and track purchases.
+
+**Responsibilities:**
+- User registration and login
+- Browse products using categories or search
+- Add products to cart
+- Place orders through checkout
+- View order history and order status
+
+---
+
+## 🔄 Application Workflow
+
+1. Admin creates seller accounts and manages categories  
+2. Sellers list products and update inventory  
+3. Customers browse products and add items to cart  
+4. Customers place orders via checkout  
+5. Inventory is validated and updated automatically  
+6. Sellers process orders and update order status  
+7. Customers track order progress in their account  
+
+---
+
+## 📊 High-Level Database Structure
+
+- Users (Admin, Seller, Customer)
+- Categories & Subcategories
+- Products
+- Inventory
+- Cart & Cart Items
+- Orders & Order Items
+- Payments
+
+---
+
+## 🎯 Project Objectives
+
+- Implement a real-world online marketplace system  
+- Apply role-based access control (RBAC)  
+- Prevent overselling using inventory validation  
+- Maintain secure data separation between vendors  
+- Understand Flask–MySQL integration  
+- Build scalable e-commerce architecture  
+
+---
+
+## ❓ Concept Check – MCQs
+
+### 🔐 Admin (Platform Administrator)
+
+1. **Who is responsible for approving and managing seller accounts?**
+   - [ ] Customer  
+   - [x] Admin  
+   - [ ] Seller  
+   - [ ] Payment Gateway  
+
+2. **Why are categories managed only by the Admin?**
+   - [x] To maintain a standardized product catalog  
+   - [ ] To limit seller access  
+   - [ ] To disable search  
+   - [ ] Categories are not important  
+
+3. **Why can the Admin view all orders on the platform?**
+   - [ ] To ship products  
+   - [ ] To modify purchases  
+   - [x] To monitor activity and resolve disputes  
+   - [ ] To cancel orders  
+
+4. **Who updates tax rates or platform-wide policies?**
+   - [ ] Customer  
+   - [ ] Seller  
+   - [x] Admin  
+   - [ ] Courier Service  
+
+5. **Which feature protects access to the Admin dashboard?**
+   - [ ] Reports  
+   - [ ] Categories  
+   - [x] Authentication & Authorization  
+   - [ ] Product Search  
+
+---
+
+### 🏪 Seller (Vendor)
+
+1. **Which feature shows sellers the orders placed for their products?**
+   - [ ] Product Listing  
+   - [x] Order Management  
+   - [ ] Platform Settings  
+   - [ ] User Registration  
+
+2. **Why is inventory management essential?**
+   - [ ] To update images  
+   - [x] To prevent overselling  
+   - [ ] To hide products  
+   - [ ] To increase delivery speed  
+
+3. **Why can sellers access only their own orders?**
+   - [x] Role-based data isolation  
+   - [ ] Orders are random  
+   - [ ] Admin restriction error  
+   - [ ] Orders are public  
+
+4. **Who uploads product details such as price and images?**
+   - [ ] Admin  
+   - [x] Seller  
+   - [ ] Customer  
+   - [ ] Payment Service  
+
+5. **Which order status indicates the product has been dispatched?**
+   - [ ] Pending  
+   - [ ] Cancelled  
+   - [x] Shipped  
+   - [ ] Viewed  
+
+---
+
+### 🧑‍💻 Customer (Buyer)
+
+1. **Which action completes a purchase?**
+   - [ ] Add to Cart  
+   - [x] Checkout / Place Order  
+   - [ ] Login  
+   - [ ] Browse  
+
+2. **What is the purpose of the cart?**
+   - [ ] Permanent storage  
+   - [x] Temporary storage before checkout  
+   - [ ] Payment processing  
+   - [ ] Order tracking  
+
+3. **Why must a customer register?**
+   - [ ] To manage sellers  
+   - [x] To store addresses and order history  
+   - [ ] To update inventory  
+   - [ ] To manage categories  
+
+4. **How can customers find specific products?**
+   - [x] Search or browse categories  
+   - [ ] Contact Admin  
+   - [ ] Update inventory  
+   - [ ] Logout  
+
+5. **Where can customers track their order status?**
+   - [ ] Cart  
+   - [ ] Product Page  
+   - [x] Order History  
+   - [ ] Seller Dashboard  
+
+---
+
