@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}All Orders - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>All Orders</h1>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Store</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order[1] }}</td>
+                    <td>{{ order[5] }}</td>
+                    <td>{{ order[6] }}</td>
+                    <td>
+                        <span style="padding: 0.25rem 0.5rem; border-radius: 4px; background: #e5e7eb;">
+                            {{ order[2]|title }}
+                        </span>
+                    </td>
+                    <td>${{ "%.2f"|format(order[3]) }}</td>
+                    <td>{{ order[4].strftime('%Y-%m-%d %H:%M') if order[4] else 'N/A' }}</td>
+                    <td>
+                        <a href="{{ url_for('order.details', order_id=order[0]) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
