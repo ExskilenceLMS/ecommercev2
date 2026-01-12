@@ -68,8 +68,19 @@ def list():
     cursor = conn.cursor()
 
     # Role Based access
+    # Admin order overview
+    if current_user.role == 'admin':
+        # Admin sees all orders
+        cursor.execute("""
+            SELECT o.id, o.order_number, o.status, o.total, o.created_at,
+                   u.email as customer_email, s.store_name
+            FROM orders o
+            JOIN users u ON o.customer_id = u.id
+            JOIN sellers s ON o.seller_id = s.id
+            ORDER BY o.created_at DESC
+        """)
     # Seller order view
-    if current_user.role == 'seller':
+    elif current_user.role == 'seller':
         # Seller sees their orders
         cursor.execute("SELECT id FROM sellers WHERE user_id = %s", (current_user.id,))
         seller = cursor.fetchone()
@@ -87,8 +98,9 @@ def list():
             conn.close()
             flash('Seller profile not found.', 'error')
             return redirect(url_for('index'))
-        
+    # Customer order history
     else:
+        # Customer sees their orders
         cursor.execute("""
             SELECT o.id, o.order_number, o.status, o.total, o.created_at, s.store_name
             FROM orders o
@@ -96,6 +108,12 @@ def list():
             WHERE o.customer_id = %s
             ORDER BY o.created_at DESC
         """, (current_user.id,))
+    
+    orders = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('order/list.html', orders=orders)
     
     orders = cursor.fetchall()
     cursor.close()
