@@ -105,3 +105,47 @@ def add(product_id):
     
     flash('Product added to cart!', 'success')
     return redirect(url_for('cart.view'))
+
+# Update cart quantity
+@cart_bp.route('/update/<int:item_id>', methods=['POST'])
+@login_required
+@customer_required
+def update(item_id):
+    """Update cart item quantity"""
+    quantity = request.form.get('quantity', type=int)
+    
+    if quantity < 1:
+        flash('Quantity must be at least 1.', 'error')
+        return redirect(url_for('cart.view'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Verify item belongs to user's cart
+    cursor.execute("""
+        SELECT ci.id, ci.product_id, i.quantity as stock_quantity
+        FROM cart_items ci
+        JOIN cart c ON ci.cart_id = c.id
+        LEFT JOIN inventory i ON ci.product_id = i.product_id
+        WHERE ci.id = %s AND c.customer_id = %s
+    """, (item_id, current_user.id))
+    item = cursor.fetchone()
+    
+    if not item:
+        flash('Cart item not found.', 'error')
+        return redirect(url_for('cart.view'))
+    
+    # Check stock
+    if item[2] and quantity > item[2]:
+        flash(f'Only {item[2]} items available in stock.', 'error')
+        return redirect(url_for('cart.view'))
+    
+    cursor.execute("""
+        UPDATE cart_items SET quantity = %s WHERE id = %s
+    """, (quantity, item_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    flash('Cart updated!', 'success')
+    return redirect(url_for('cart.view'))
