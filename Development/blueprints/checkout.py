@@ -194,3 +194,32 @@ def place_order():
         flash(f'Error placing order: {str(e)}', 'error')
         return redirect(url_for('checkout.review'))
 
+
+# Order confirmation page
+@checkout_bp.route('/confirmation')
+@login_required
+@customer_required
+def confirmation():
+    """Order confirmation page"""
+    order_numbers = request.args.get('order_numbers', '').split(',')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    orders = []
+    for order_num in order_numbers:
+        if order_num:
+            cursor.execute("""
+                SELECT id, order_number, total, created_at, status
+                FROM orders
+                WHERE order_number = %s AND customer_id = %s
+            """, (order_num.strip(), current_user.id))
+            order = cursor.fetchone()
+            if order:
+                orders.append(order)
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('checkout/confirmation.html', orders=orders)
+
