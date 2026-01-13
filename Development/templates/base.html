@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('index') }}">E-Commerce</a>
+            </div>
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <span>Welcome, {{ current_user.first_name or current_user.email }}!</span>
+                    {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                        <a href="{{ url_for('admin.sellers') }}">Sellers</a>
+                        <a href="{{ url_for('admin.categories') }}">Categories</a>
+                        <a href="{{ url_for('admin.orders') }}">Orders</a>
+                    {% elif current_user.role == 'seller' %}
+                        <a href="{{ url_for('seller.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('seller.products') }}">Products</a>
+                        <a href="{{ url_for('seller.orders') }}">Orders</a>
+                    {% elif current_user.role == 'customer' %}
+                        <a href="{{ url_for('customer.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('product.list') }}">Products</a>
+                        <a href="{{ url_for('cart.view') }}">Cart</a>
+                        <a href="{{ url_for('customer.orders') }}">Orders</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('product.list') }}">Products</a>
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('auth.register') }}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 E-Commerce App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
