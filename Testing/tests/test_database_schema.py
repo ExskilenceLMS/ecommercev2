@@ -1,0 +1,857 @@
+"""
+Test cases for Task 2: Database Design
+Validates database creation and table structures
+"""
+
+import pytest
+import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+load_dotenv()
+
+# Try to import MySQLdb, fallback to PyMySQL
+try:
+    import MySQLdb
+except ImportError:
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+        import MySQLdb
+    except ImportError:
+        pytest.skip("PyMySQL not installed", allow_module_level=True)
+
+
+@pytest.fixture(scope="module")
+def db_connection():
+    """Create database connection for testing"""
+    host = os.getenv("MYSQL_HOST", "localhost")
+    user = os.getenv("MYSQL_USER", "root")
+    password = os.getenv("MYSQL_PASSWORD", "")
+    db_name = os.getenv("MYSQL_DB", "ecommerce_db")
+    
+    try:
+        conn = MySQLdb.connect(
+            host=host,
+            user=user,
+            passwd=password,
+            db=db_name,
+            charset='utf8mb4'
+        )
+        yield conn
+        conn.close()
+    except MySQLdb.Error as e:
+        pytest.skip(f"Cannot connect to database: {e}", allow_module_level=True)
+
+
+@pytest.fixture(scope="module")
+def cursor(db_connection):
+    """Create database cursor"""
+    cursor = db_connection.cursor()
+    yield cursor
+    cursor.close()
+
+
+@pytest.mark.integration
+class TestDatabaseExistence:
+    """Test if database exists and is accessible"""
+    
+    def test_database_exists(self, db_connection):
+        """Test that the database exists and is accessible"""
+        assert db_connection is not None
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT DATABASE()")
+        db_name = cursor.fetchone()[0]
+        assert db_name is not None
+        assert db_name == os.getenv("MYSQL_DB", "ecommerce_db")
+        cursor.close()
+    
+    def test_database_connection_works(self, db_connection):
+        """Test that we can execute queries on the database"""
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        assert result[0] == 1
+        cursor.close()
+
+
+@pytest.mark.integration
+class TestTableExistence:
+    """Test if all required tables exist"""
+    
+    @pytest.mark.parametrize("table_name", [
+        "users",
+        "sellers",
+        "categories",
+        "products",
+        "inventory",
+        "addresses",
+        "cart",
+        "cart_items",
+        "orders",
+        "order_items",
+        "payments"
+    ])
+    def test_table_exists(self, cursor, table_name):
+        """Test that each required table exists"""
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.tables 
+            WHERE table_schema = DATABASE() 
+            AND table_name = %s
+        """, (table_name,))
+        result = cursor.fetchone()
+        assert result[0] == 1, f"Table '{table_name}' does not exist"
+    
+    def test_all_tables_count(self, cursor):
+        """Test that exactly 11 tables exist"""
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.tables 
+            WHERE table_schema = DATABASE() 
+            AND table_type = 'BASE TABLE'
+        """)
+        result = cursor.fetchone()
+        assert result[0] == 11, f"Expected 11 tables, found {result[0]}"
+
+
+@pytest.mark.integration
+class TestUsersTable:
+    """Test users table structure"""
+    
+    def test_users_table_columns(self, cursor):
+        """Test that users table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY, EXTRA
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'users'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4],
+            'extra': row[5]
+        } for row in cursor.fetchall()}
+        
+        # Check required columns exist
+        required_columns = ['id', 'email', 'password_hash', 'role', 'first_name', 
+                          'last_name', 'phone', 'is_active', 'created_at', 'updated_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in users table"
+        
+        # Check primary key
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert 'auto_increment' in columns['id']['extra'].lower(), "Column 'id' should be AUTO_INCREMENT"
+        
+        # Check NOT NULL constraints
+        assert columns['email']['nullable'] == 'NO', "Column 'email' should be NOT NULL"
+        assert columns['password_hash']['nullable'] == 'NO', "Column 'password_hash' should be NOT NULL"
+        assert columns['role']['nullable'] == 'NO', "Column 'role' should be NOT NULL"
+        
+        # Check UNIQUE constraint on email
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.table_constraints 
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'users' 
+            AND constraint_type = 'UNIQUE'
+            AND constraint_name LIKE '%email%'
+        """)
+        assert cursor.fetchone()[0] >= 1, "Email should have UNIQUE constraint"
+        
+        # Check ENUM for role
+        cursor.execute("""
+            SELECT COLUMN_TYPE 
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'users' 
+            AND column_name = 'role'
+        """)
+        role_type = cursor.fetchone()[0]
+        assert 'enum' in role_type.lower(), "Role should be ENUM type"
+        assert 'admin' in role_type.lower() and 'seller' in role_type.lower() and 'customer' in role_type.lower()
+    
+    def test_users_table_indexes(self, cursor):
+        """Test that users table has required indexes"""
+        cursor.execute("""
+            SELECT INDEX_NAME, COLUMN_NAME
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = 'users'
+            AND INDEX_NAME != 'PRIMARY'
+        """)
+        indexes = {row[0]: [] for row in cursor.fetchall()}
+        cursor.execute("""
+            SELECT INDEX_NAME, COLUMN_NAME
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = 'users'
+            AND INDEX_NAME != 'PRIMARY'
+        """)
+        for row in cursor.fetchall():
+            if row[0] not in indexes:
+                indexes[row[0]] = []
+            indexes[row[0]].append(row[1])
+        
+        # Check for email index
+        has_email_idx = any('email' in cols for cols in indexes.values())
+        assert has_email_idx, "Users table should have index on email"
+        
+        # Check for role index
+        has_role_idx = any('role' in cols for cols in indexes.values())
+        assert has_role_idx, "Users table should have index on role"
+
+
+@pytest.mark.integration
+class TestSellersTable:
+    """Test sellers table structure"""
+    
+    def test_sellers_table_columns(self, cursor):
+        """Test that sellers table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'sellers'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'user_id', 'store_name', 'store_description', 
+                          'contact_email', 'contact_phone', 'address', 'created_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in sellers table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['user_id']['nullable'] == 'NO', "Column 'user_id' should be NOT NULL"
+        assert columns['store_name']['nullable'] == 'NO', "Column 'store_name' should be NOT NULL"
+    
+    def test_sellers_foreign_key(self, cursor):
+        """Test that sellers table has foreign key to users"""
+        cursor.execute("""
+            SELECT CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'sellers' 
+            AND referenced_table_name IS NOT NULL
+        """)
+        fks = cursor.fetchall()
+        assert len(fks) > 0, "Sellers table should have foreign key"
+        user_fk = [fk for fk in fks if fk[1] == 'users' and fk[2] == 'id']
+        assert len(user_fk) > 0, "Sellers table should have foreign key to users.id"
+    
+    def test_sellers_unique_constraint(self, cursor):
+        """Test that user_id has UNIQUE constraint"""
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.table_constraints 
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'sellers' 
+            AND constraint_type = 'UNIQUE'
+        """)
+        assert cursor.fetchone()[0] >= 1, "user_id should have UNIQUE constraint"
+
+
+@pytest.mark.integration
+class TestCategoriesTable:
+    """Test categories table structure"""
+    
+    def test_categories_table_columns(self, cursor):
+        """Test that categories table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'categories'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'key': row[3]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'name', 'parent_id', 'description', 'slug', 'created_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in categories table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['name']['nullable'] == 'NO', "Column 'name' should be NOT NULL"
+    
+    def test_categories_self_referential_foreign_key(self, cursor):
+        """Test that categories table has self-referential foreign key"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'categories' 
+            AND column_name = 'parent_id'
+            AND referenced_table_name IS NOT NULL
+        """)
+        fk = cursor.fetchone()
+        assert fk is not None, "parent_id should have foreign key"
+        assert fk[0] == 'categories', "parent_id should reference categories table"
+        assert fk[1] == 'id', "parent_id should reference categories.id"
+
+
+@pytest.mark.integration
+class TestProductsTable:
+    """Test products table structure"""
+    
+    def test_products_table_columns(self, cursor):
+        """Test that products table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'products'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'seller_id', 'category_id', 'name', 'description', 
+                          'price', 'sku', 'image_url', 'is_active', 'created_at', 'updated_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in products table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['seller_id']['nullable'] == 'NO', "Column 'seller_id' should be NOT NULL"
+        assert columns['category_id']['nullable'] == 'NO', "Column 'category_id' should be NOT NULL"
+        assert columns['name']['nullable'] == 'NO', "Column 'name' should be NOT NULL"
+        assert columns['price']['nullable'] == 'NO', "Column 'price' should be NOT NULL"
+    
+    def test_products_foreign_keys(self, cursor):
+        """Test that products table has foreign keys to sellers and categories"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'products' 
+            AND referenced_table_name IS NOT NULL
+        """)
+        fks = [row[0] for row in cursor.fetchall()]
+        assert 'sellers' in fks, "Products table should have foreign key to sellers"
+        assert 'categories' in fks, "Products table should have foreign key to categories"
+    
+    def test_products_indexes(self, cursor):
+        """Test that products table has required indexes"""
+        cursor.execute("""
+            SELECT COLUMN_NAME
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = 'products'
+            AND INDEX_NAME != 'PRIMARY'
+        """)
+        indexed_columns = [row[0] for row in cursor.fetchall()]
+        assert 'seller_id' in indexed_columns, "Products should have index on seller_id"
+        assert 'category_id' in indexed_columns, "Products should have index on category_id"
+        assert 'sku' in indexed_columns, "Products should have index on sku"
+
+
+@pytest.mark.integration
+class TestInventoryTable:
+    """Test inventory table structure"""
+    
+    def test_inventory_table_columns(self, cursor):
+        """Test that inventory table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'inventory'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'product_id', 'quantity', 'low_stock_threshold', 'last_updated']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in inventory table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['product_id']['nullable'] == 'NO', "Column 'product_id' should be NOT NULL"
+        assert columns['quantity']['nullable'] == 'NO', "Column 'quantity' should be NOT NULL"
+    
+    def test_inventory_foreign_key(self, cursor):
+        """Test that inventory table has foreign key to products"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'inventory' 
+            AND column_name = 'product_id'
+            AND referenced_table_name IS NOT NULL
+        """)
+        fk = cursor.fetchone()
+        assert fk is not None, "Inventory should have foreign key to products"
+        assert fk[0] == 'products', "Inventory should reference products table"
+    
+    def test_inventory_unique_constraint(self, cursor):
+        """Test that product_id has UNIQUE constraint"""
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu 
+                ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.table_schema = DATABASE() 
+            AND tc.table_name = 'inventory' 
+            AND tc.constraint_type = 'UNIQUE'
+            AND kcu.column_name = 'product_id'
+        """)
+        assert cursor.fetchone()[0] >= 1, "product_id should have UNIQUE constraint"
+
+
+@pytest.mark.integration
+class TestAddressesTable:
+    """Test addresses table structure"""
+    
+    def test_addresses_table_columns(self, cursor):
+        """Test that addresses table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'addresses'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'user_id', 'address_line1', 'address_line2', 
+                          'city', 'state', 'postal_code', 'country', 'is_default', 'created_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in addresses table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['user_id']['nullable'] == 'NO', "Column 'user_id' should be NOT NULL"
+        assert columns['address_line1']['nullable'] == 'NO', "Column 'address_line1' should be NOT NULL"
+        assert columns['city']['nullable'] == 'NO', "Column 'city' should be NOT NULL"
+        assert columns['state']['nullable'] == 'NO', "Column 'state' should be NOT NULL"
+        assert columns['postal_code']['nullable'] == 'NO', "Column 'postal_code' should be NOT NULL"
+    
+    def test_addresses_foreign_key(self, cursor):
+        """Test that addresses table has foreign key to users"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'addresses' 
+            AND column_name = 'user_id'
+            AND referenced_table_name IS NOT NULL
+        """)
+        fk = cursor.fetchone()
+        assert fk is not None, "Addresses should have foreign key to users"
+        assert fk[0] == 'users', "Addresses should reference users table"
+
+
+@pytest.mark.integration
+class TestCartTable:
+    """Test cart table structure"""
+    
+    def test_cart_table_columns(self, cursor):
+        """Test that cart table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'cart'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'key': row[3]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'customer_id', 'created_at', 'updated_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in cart table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['customer_id']['nullable'] == 'NO', "Column 'customer_id' should be NOT NULL"
+    
+    def test_cart_foreign_key(self, cursor):
+        """Test that cart table has foreign key to users"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'cart' 
+            AND column_name = 'customer_id'
+            AND referenced_table_name IS NOT NULL
+        """)
+        fk = cursor.fetchone()
+        assert fk is not None, "Cart should have foreign key to users"
+        assert fk[0] == 'users', "Cart should reference users table"
+
+
+@pytest.mark.integration
+class TestCartItemsTable:
+    """Test cart_items table structure"""
+    
+    def test_cart_items_table_columns(self, cursor):
+        """Test that cart_items table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'cart_items'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'cart_id', 'product_id', 'quantity', 'created_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in cart_items table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['cart_id']['nullable'] == 'NO', "Column 'cart_id' should be NOT NULL"
+        assert columns['product_id']['nullable'] == 'NO', "Column 'product_id' should be NOT NULL"
+        assert columns['quantity']['nullable'] == 'NO', "Column 'quantity' should be NOT NULL"
+    
+    def test_cart_items_foreign_keys(self, cursor):
+        """Test that cart_items table has foreign keys"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'cart_items' 
+            AND referenced_table_name IS NOT NULL
+        """)
+        fks = [row[0] for row in cursor.fetchall()]
+        assert 'cart' in fks, "Cart_items should have foreign key to cart"
+        assert 'products' in fks, "Cart_items should have foreign key to products"
+    
+    def test_cart_items_unique_constraint(self, cursor):
+        """Test that cart_id and product_id have unique constraint together"""
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.table_constraints 
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'cart_items' 
+            AND constraint_type = 'UNIQUE'
+        """)
+        assert cursor.fetchone()[0] >= 1, "cart_items should have UNIQUE constraint on (cart_id, product_id)"
+
+
+@pytest.mark.integration
+class TestOrdersTable:
+    """Test orders table structure"""
+    
+    def test_orders_table_columns(self, cursor):
+        """Test that orders table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'orders'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'order_number', 'customer_id', 'seller_id', 
+                          'shipping_address_id', 'status', 'subtotal', 'tax', 
+                          'shipping_cost', 'total', 'notes', 'created_at', 'updated_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in orders table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['order_number']['nullable'] == 'NO', "Column 'order_number' should be NOT NULL"
+        assert columns['customer_id']['nullable'] == 'NO', "Column 'customer_id' should be NOT NULL"
+        assert columns['seller_id']['nullable'] == 'NO', "Column 'seller_id' should be NOT NULL"
+        assert columns['shipping_address_id']['nullable'] == 'NO', "Column 'shipping_address_id' should be NOT NULL"
+        assert columns['subtotal']['nullable'] == 'NO', "Column 'subtotal' should be NOT NULL"
+        assert columns['total']['nullable'] == 'NO', "Column 'total' should be NOT NULL"
+    
+    def test_orders_foreign_keys(self, cursor):
+        """Test that orders table has foreign keys"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'orders' 
+            AND referenced_table_name IS NOT NULL
+        """)
+        fks = [row[0] for row in cursor.fetchall()]
+        assert 'users' in fks, "Orders should have foreign key to users (customer_id)"
+        assert 'sellers' in fks, "Orders should have foreign key to sellers"
+        assert 'addresses' in fks, "Orders should have foreign key to addresses"
+    
+    def test_orders_status_enum(self, cursor):
+        """Test that status is ENUM with correct values"""
+        cursor.execute("""
+            SELECT COLUMN_TYPE 
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'orders' 
+            AND column_name = 'status'
+        """)
+        status_type = cursor.fetchone()[0].lower()
+        assert 'enum' in status_type, "Status should be ENUM type"
+        required_statuses = ['placed', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled']
+        for status in required_statuses:
+            assert status in status_type, f"Status ENUM should include '{status}'"
+    
+    def test_orders_indexes(self, cursor):
+        """Test that orders table has required indexes"""
+        cursor.execute("""
+            SELECT COLUMN_NAME
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = 'orders'
+            AND INDEX_NAME != 'PRIMARY'
+        """)
+        indexed_columns = [row[0] for row in cursor.fetchall()]
+        assert 'customer_id' in indexed_columns, "Orders should have index on customer_id"
+        assert 'seller_id' in indexed_columns, "Orders should have index on seller_id"
+        assert 'status' in indexed_columns, "Orders should have index on status"
+        assert 'order_number' in indexed_columns, "Orders should have index on order_number"
+
+
+@pytest.mark.integration
+class TestOrderItemsTable:
+    """Test order_items table structure"""
+    
+    def test_order_items_table_columns(self, cursor):
+        """Test that order_items table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'order_items'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'key': row[3]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'order_id', 'product_id', 'quantity', 'price', 'subtotal']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in order_items table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['order_id']['nullable'] == 'NO', "Column 'order_id' should be NOT NULL"
+        assert columns['product_id']['nullable'] == 'NO', "Column 'product_id' should be NOT NULL"
+        assert columns['quantity']['nullable'] == 'NO', "Column 'quantity' should be NOT NULL"
+        assert columns['price']['nullable'] == 'NO', "Column 'price' should be NOT NULL"
+        assert columns['subtotal']['nullable'] == 'NO', "Column 'subtotal' should be NOT NULL"
+    
+    def test_order_items_foreign_keys(self, cursor):
+        """Test that order_items table has foreign keys"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'order_items' 
+            AND referenced_table_name IS NOT NULL
+        """)
+        fks = [row[0] for row in cursor.fetchall()]
+        assert 'orders' in fks, "Order_items should have foreign key to orders"
+        assert 'products' in fks, "Order_items should have foreign key to products"
+
+
+@pytest.mark.integration
+class TestPaymentsTable:
+    """Test payments table structure"""
+    
+    def test_payments_table_columns(self, cursor):
+        """Test that payments table has all required columns"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() AND table_name = 'payments'
+            ORDER BY ORDINAL_POSITION
+        """)
+        columns = {row[0]: {
+            'type': row[1],
+            'nullable': row[2],
+            'default': row[3],
+            'key': row[4]
+        } for row in cursor.fetchall()}
+        
+        required_columns = ['id', 'order_id', 'amount', 'payment_method', 'status', 
+                          'transaction_id', 'invoice_number', 'payment_date', 'created_at']
+        for col in required_columns:
+            assert col in columns, f"Column '{col}' missing in payments table"
+        
+        assert columns['id']['key'] == 'PRI', "Column 'id' should be PRIMARY KEY"
+        assert columns['order_id']['nullable'] == 'NO', "Column 'order_id' should be NOT NULL"
+        assert columns['amount']['nullable'] == 'NO', "Column 'amount' should be NOT NULL"
+        assert columns['payment_method']['nullable'] == 'NO', "Column 'payment_method' should be NOT NULL"
+    
+    def test_payments_foreign_key(self, cursor):
+        """Test that payments table has foreign key to orders"""
+        cursor.execute("""
+            SELECT REFERENCED_TABLE_NAME
+            FROM information_schema.key_column_usage
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'payments' 
+            AND column_name = 'order_id'
+            AND referenced_table_name IS NOT NULL
+        """)
+        fk = cursor.fetchone()
+        assert fk is not None, "Payments should have foreign key to orders"
+        assert fk[0] == 'orders', "Payments should reference orders table"
+    
+    def test_payments_enums(self, cursor):
+        """Test that payment_method and status are ENUMs"""
+        cursor.execute("""
+            SELECT COLUMN_NAME, COLUMN_TYPE 
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE() 
+            AND table_name = 'payments' 
+            AND column_name IN ('payment_method', 'status')
+        """)
+        enums = {row[0]: row[1].lower() for row in cursor.fetchall()}
+        
+        assert 'enum' in enums['payment_method'], "payment_method should be ENUM"
+        assert 'enum' in enums['status'], "status should be ENUM"
+        
+        # Check payment_method values
+        payment_methods = ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery']
+        for method in payment_methods:
+            assert method in enums['payment_method'], f"payment_method ENUM should include '{method}'"
+        
+        # Check status values
+        statuses = ['pending', 'completed', 'failed', 'refunded']
+        for status in statuses:
+            assert status in enums['status'], f"status ENUM should include '{status}'"
+    
+    def test_payments_indexes(self, cursor):
+        """Test that payments table has required indexes"""
+        cursor.execute("""
+            SELECT COLUMN_NAME
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = 'payments'
+            AND INDEX_NAME != 'PRIMARY'
+        """)
+        indexed_columns = [row[0] for row in cursor.fetchall()]
+        assert 'order_id' in indexed_columns, "Payments should have index on order_id"
+        assert 'status' in indexed_columns, "Payments should have index on status"
+        assert 'transaction_id' in indexed_columns, "Payments should have index on transaction_id"
+
+
+@pytest.mark.integration
+class TestForeignKeyConstraints:
+    """Test foreign key constraints and their behaviors"""
+    
+    def test_foreign_key_cascade_behaviors(self, cursor):
+        """Test that foreign keys have correct ON DELETE behaviors"""
+        # Test CASCADE behaviors
+        cursor.execute("""
+            SELECT DELETE_RULE
+            FROM information_schema.referential_constraints rc
+            JOIN information_schema.key_column_usage kcu 
+                ON rc.constraint_name = kcu.constraint_name
+            WHERE rc.constraint_schema = DATABASE()
+            AND kcu.table_name = 'sellers'
+            AND kcu.column_name = 'user_id'
+        """)
+        result = cursor.fetchone()
+        if result:
+            assert result[0] == 'CASCADE', "sellers.user_id should have ON DELETE CASCADE"
+        
+        # Test RESTRICT behaviors
+        cursor.execute("""
+            SELECT DELETE_RULE
+            FROM information_schema.referential_constraints rc
+            JOIN information_schema.key_column_usage kcu 
+                ON rc.constraint_name = kcu.constraint_name
+            WHERE rc.constraint_schema = DATABASE()
+            AND kcu.table_name = 'orders'
+            AND kcu.column_name = 'customer_id'
+        """)
+        result = cursor.fetchone()
+        if result:
+            assert result[0] == 'RESTRICT', "orders.customer_id should have ON DELETE RESTRICT"
+        
+        # Test SET NULL behavior
+        cursor.execute("""
+            SELECT DELETE_RULE
+            FROM information_schema.referential_constraints rc
+            JOIN information_schema.key_column_usage kcu 
+                ON rc.constraint_name = kcu.constraint_name
+            WHERE rc.constraint_schema = DATABASE()
+            AND kcu.table_name = 'categories'
+            AND kcu.column_name = 'parent_id'
+        """)
+        result = cursor.fetchone()
+        if result:
+            assert result[0] == 'SET NULL', "categories.parent_id should have ON DELETE SET NULL"
+
+
+@pytest.mark.integration
+class TestDataTypes:
+    """Test that columns have correct data types"""
+    
+    def test_decimal_columns(self, cursor):
+        """Test that price/amount columns are DECIMAL"""
+        decimal_columns = [
+            ('products', 'price'),
+            ('orders', 'subtotal'),
+            ('orders', 'tax'),
+            ('orders', 'shipping_cost'),
+            ('orders', 'total'),
+            ('order_items', 'price'),
+            ('order_items', 'subtotal'),
+            ('payments', 'amount')
+        ]
+        
+        for table, column in decimal_columns:
+            cursor.execute("""
+                SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                AND table_name = %s
+                AND column_name = %s
+            """, (table, column))
+            result = cursor.fetchone()
+            assert result is not None, f"{table}.{column} should exist"
+            assert result[0] == 'decimal', f"{table}.{column} should be DECIMAL type"
+            assert result[1] == 10, f"{table}.{column} should have precision 10"
+            assert result[2] == 2, f"{table}.{column} should have scale 2"
+    
+    def test_timestamp_columns(self, cursor):
+        """Test that timestamp columns are correctly defined"""
+        timestamp_tables = ['users', 'products', 'orders', 'cart']
+        for table in timestamp_tables:
+            cursor.execute("""
+                SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT, EXTRA
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                AND table_name = %s
+                AND column_name IN ('created_at', 'updated_at')
+            """, (table,))
+            for row in cursor.fetchall():
+                assert row[1] in ['timestamp', 'datetime'], f"{table}.{row[0]} should be TIMESTAMP or DATETIME"
+                if row[0] == 'created_at':
+                    assert 'current_timestamp' in str(row[2]).lower() or row[2] is None, \
+                        f"{table}.created_at should have DEFAULT CURRENT_TIMESTAMP"
+                if row[0] == 'updated_at':
+                    assert 'on update' in row[3].lower() or 'current_timestamp' in str(row[2]).lower(), \
+                        f"{table}.updated_at should have ON UPDATE CURRENT_TIMESTAMP"
+
