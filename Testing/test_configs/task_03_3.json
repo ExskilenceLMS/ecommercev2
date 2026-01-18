@@ -1,0 +1,14 @@
+{
+  "task_id": "03_3",
+  "task_name": "Task 3 - Subtask 3.3: RBAC intro - Map modules to roles",
+  "description": "Module-to-role mapping documentation and helper functions",
+  "mandatory_tests": [
+    {
+      "name": "test_task_3_3_module_mapping",
+      "description": "Test module-to-role mapping functionality",
+      "file": "tests/test_task_3_3_module_mapping.py"
+    }
+  ],
+  "optional_tests": []
+}
+
