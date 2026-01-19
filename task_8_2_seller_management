@@ -1,0 +1,99 @@
+# Task 8 – Subtask 8.2: Seller Management
+
+## 1. Overview
+
+This subtask introduces **Seller Management functionality** within the Admin Dashboard.  
+It allows administrators to **view, create, and manage seller accounts**, ensuring controlled access to seller-level operations in the system.
+
+This feature is accessible **only to Admin users** and builds upon the Admin Dashboard route introduced in Task 8.1.
+
+---
+
+## 2. Purpose
+
+The purpose of this subtask is to:
+
+- Enable administrators to manage seller accounts
+- Provide a centralized interface for seller administration
+- Enforce role-based access for seller-related operations
+- Prepare the system for seller-driven product and order management
+
+---
+
+## 3. Prerequisites
+
+Before completing this subtask, the following should already be implemented:
+
+- Admin dashboard route (Task 8.1)
+- Role-based access control for Admin users
+- User model with role support
+- Admin blueprint structure
+- Base layout template
+
+---
+
+## 4. Seller Management Features
+
+This subtask includes the following admin capabilities:
+
+- View a list of existing sellers
+- Access a seller creation form
+- Add new sellers to the system
+- Maintain separation between Admin and Seller roles
+
+---
+
+## 5. Access Control
+
+- All seller management routes are **restricted to Admin users**
+- Unauthorized users are blocked from accessing seller-related admin pages
+- Role validation occurs before any seller operation is performed
+
+This ensures seller accounts are created and managed securely.
+
+---
+
+## 6. Implementation Summary
+
+- Seller management routes are defined within the admin blueprint
+- Seller listing and creation logic is clearly separated from other admin features
+- Templates extend the shared base layout for UI consistency
+- Code related to this subtask is clearly marked for maintainability
+
+---
+
+## 7. Scope and Limitations
+
+**Included in this subtask:**
+- Seller listing functionality
+- Seller creation workflow
+- Admin-only access enforcement
+
+**Not included in this subtask:**
+- Seller performance analytics
+- Seller product management
+- Seller order handling
+- Seller account suspension or deletion
+
+These features are handled in later tasks.
+
+---
+
+## 8. Outcome
+
+After completing this subtask:
+
+- Admins can create and manage seller accounts
+- Seller access is clearly controlled and role-based
+- The system supports multi-role operations
+- The application is ready for seller-specific dashboards and features
+
+---
+
+## 9. Related Tasks
+
+- Task 8.1 – Admin Routes
+- Task 9 – Seller Dashboard
+- Task 11 – Product Listing & Search
+
+---
