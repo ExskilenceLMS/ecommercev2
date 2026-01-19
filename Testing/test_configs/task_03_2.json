@@ -1,0 +1,14 @@
+{
+  "task_id": "03_2",
+  "task_name": "Task 3 - Subtask 3.2: Restrict seller/admin/customer actions",
+  "description": "RBAC decorators for route protection and action restrictions",
+  "mandatory_tests": [
+    {
+      "name": "test_task_3_2_rbac_decorators",
+      "description": "Test RBAC decorators for route protection",
+      "file": "tests/test_task_3_2_rbac_decorators.py"
+    }
+  ],
+  "optional_tests": []
+}
+
