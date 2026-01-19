@@ -1,0 +1,51 @@
+{
+  "id": "task11p3",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/product/details.html",
+            "requiredElements": ["h1", "img", "form"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Product details page loads",
+          "path": "/products/1",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "img, div[style*='background']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+

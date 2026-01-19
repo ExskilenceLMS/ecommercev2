@@ -1,0 +1,57 @@
+{
+  "id": "task8p1",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/admin/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Admin dashboard is accessible",
+          "path": "/admin/dashboard",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/dashboard"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": ".dashboard-stats"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+
