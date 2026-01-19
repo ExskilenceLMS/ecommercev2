@@ -1,0 +1,56 @@
+{
+  "id": "task12p2",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/cart/view.html",
+            "requiredElements": [
+              "form",
+              "input",
+              "button"
+            ]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Task 12 2 Update Quantity test",
+          "path": "/cart/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {
+              "type": "url",
+              "value": "/cart/"
+            }
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
