@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Sellers - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Manage Sellers</h1>
+        <a href="{{ url_for('admin.create_seller') }}" class="btn btn-primary">Create New Seller</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Store Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seller in sellers %}
+                <tr>
+                    <td>{{ seller[1] }}</td>
+                    <td>{{ seller[2] }}</td>
+                    <td>{{ seller[5] or 'N/A' }}</td>
+                    <td>{{ seller[7].strftime('%Y-%m-%d') if seller[7] else 'N/A' }}</td>
+                    <td>
+                        <a href="#" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
