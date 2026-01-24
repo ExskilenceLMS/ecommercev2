@@ -32,6 +32,5 @@ touch Development/templates/errors/{403.html,404.html}
 
 touch Development/static/css/style.css
 
-touch Development/tests/{conftest.py,conftest_playwright.py}
-
-touch Development/tests/fixtures/users.py
+touch testing_config/py_tests/task.py
+touch testing_config/ui_tests/task.json
