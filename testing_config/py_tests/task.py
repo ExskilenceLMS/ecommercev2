@@ -889,3 +889,118 @@ class TestRBACDecorators:
                 location = response.headers.get('Location', '')
                 assert '/login' in location or '/auth/login' in location, \
                     f"Expected redirect to login, got: {location}"
+
+
+# =====================================================
+# Subtask: task_3_3_rbac_intro
+# Description: Module-to-role mapping documentation and helper functions
+# Files Changed: Development/module_mapping.py (MODULE_ROLE_MAPPING, get_modules_for_role, get_role_for_module)
+# =====================================================
+
+@pytest.mark.unit
+class TestModuleMapping:
+    """Test module-to-role mapping functionality"""
+
+    def test_module_mapping_structure(self):
+        """Test that MODULE_ROLE_MAPPING has expected structure"""
+        from Development.module_mapping import MODULE_ROLE_MAPPING
+
+        assert 'admin' in MODULE_ROLE_MAPPING
+        assert 'seller' in MODULE_ROLE_MAPPING
+        assert 'customer' in MODULE_ROLE_MAPPING
+        assert 'product' in MODULE_ROLE_MAPPING
+        assert 'cart' in MODULE_ROLE_MAPPING
+        assert 'checkout' in MODULE_ROLE_MAPPING
+        assert 'order' in MODULE_ROLE_MAPPING
+        assert 'payment' in MODULE_ROLE_MAPPING
+
+    def test_module_mapping_admin(self):
+        """Test admin module mapping"""
+        from Development.module_mapping import MODULE_ROLE_MAPPING
+
+        admin_module = MODULE_ROLE_MAPPING['admin']
+        assert admin_module['required_role'] == 'admin'
+        assert 'blueprint' in admin_module
+        assert 'routes' in admin_module
+        assert 'permissions' in admin_module
+        assert 'manage_sellers' in admin_module['permissions']
+
+    def test_module_mapping_seller(self):
+        """Test seller module mapping"""
+        from Development.module_mapping import MODULE_ROLE_MAPPING
+
+        seller_module = MODULE_ROLE_MAPPING['seller']
+        assert seller_module['required_role'] == 'seller'
+        assert 'allowed_roles' in seller_module
+        assert 'admin' in seller_module['allowed_roles']
+        assert 'seller' in seller_module['allowed_roles']
+        assert 'manage_products' in seller_module['permissions']
+
+    def test_module_mapping_customer(self):
+        """Test customer module mapping"""
+        from Development.module_mapping import MODULE_ROLE_MAPPING
+
+        customer_module = MODULE_ROLE_MAPPING['customer']
+        assert customer_module['required_role'] == 'customer'
+        assert 'allowed_roles' in customer_module
+        assert 'admin' in customer_module['allowed_roles']
+        assert 'customer' in customer_module['allowed_roles']
+        assert 'manage_cart' in customer_module['permissions']
+
+    def test_get_modules_for_role_admin(self):
+        """Test get_modules_for_role for admin (should have access to all)"""
+        from Development.module_mapping import get_modules_for_role
+
+        modules = get_modules_for_role('admin')
+        assert 'admin' in modules
+        assert 'seller' in modules
+        assert 'customer' in modules
+        assert 'product' in modules
+        assert 'cart' in modules
+        assert 'checkout' in modules
+        assert 'order' in modules
+        assert 'payment' in modules
+
+    def test_get_modules_for_role_seller(self):
+        """Test get_modules_for_role for seller"""
+        from Development.module_mapping import get_modules_for_role
+
+        modules = get_modules_for_role('seller')
+        assert 'seller' in modules
+        assert 'product' in modules  # Public module
+        assert 'admin' not in modules  # Seller cannot access admin module
+        assert 'customer' not in modules  # Seller cannot access customer module
+
+    def test_get_modules_for_role_customer(self):
+        """Test get_modules_for_role for customer"""
+        from Development.module_mapping import get_modules_for_role
+
+        modules = get_modules_for_role('customer')
+        assert 'customer' in modules
+        assert 'product' in modules  # Public module
+        assert 'cart' in modules
+        assert 'checkout' in modules
+        assert 'payment' in modules
+        assert 'admin' not in modules  # Customer cannot access admin module
+        assert 'seller' not in modules  # Customer cannot access seller module
+
+    def test_get_role_for_module(self):
+        """Test get_role_for_module function"""
+        from Development.module_mapping import get_role_for_module
+
+        admin_role_info = get_role_for_module('admin')
+        assert admin_role_info['required_role'] == 'admin'
+
+        seller_role_info = get_role_for_module('seller')
+        assert seller_role_info['required_role'] == 'seller'
+        assert 'admin' in seller_role_info['allowed_roles']
+
+        product_role_info = get_role_for_module('product')
+        assert product_role_info['required_role'] is None  # Public module
+
+    def test_get_role_for_module_invalid(self):
+        """Test get_role_for_module with invalid module"""
+        from Development.module_mapping import get_role_for_module
+
+        result = get_role_for_module('invalid_module')
+        assert result is None
