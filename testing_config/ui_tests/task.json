@@ -21,6 +21,11 @@
             "subtask": "task_4_2_admin_dashboard_UI",
             "file": "templates/admin/dashboard.html",
             "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          },
+          {
+            "subtask": "task_4_3_seller_sashboard_UI",
+            "file": "templates/seller/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
           }
         ]
       },
@@ -36,6 +41,11 @@
             "subtask": "task_4_2_admin_dashboard_UI",
             "file": "static/css/style.css",
             "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          },
+          {
+            "subtask": "task_4_3_seller_sashboard_UI",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".quick-actions"]
           }
         ]
       }
