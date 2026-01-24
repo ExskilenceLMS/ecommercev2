@@ -701,3 +701,191 @@ class TestRBACClass:
         assert 'place_orders' in customer_perms
         assert 'view_own_orders' in customer_perms
         assert 'manage_profile' in customer_perms
+
+
+# =====================================================
+# Subtask: task_3_2_restrict_actions
+# Description: RBAC decorators for route protection and action restrictions
+# Files Changed: Development/rbac.py (decorators: role_required, admin_required, seller_required, customer_required, permission_required)
+# =====================================================
+
+from unittest.mock import patch
+from werkzeug.exceptions import Forbidden
+
+
+@pytest.fixture
+def flask_app():
+    """Create a Flask app context for decorator tests"""
+    try:
+        from flask_login import LoginManager
+        from app import app as flask_app
+        flask_app.config['TESTING'] = True
+        flask_app.config['WTF_CSRF_ENABLED'] = False
+
+        ctx = flask_app.app_context()
+        ctx.push()
+        yield flask_app
+        ctx.pop()
+    except ImportError:
+        pytest.skip("Flask app not available", allow_module_level=True)
+
+
+@pytest.mark.unit
+class TestRBACDecorators:
+    """Test RBAC decorators for route protection"""
+
+    @patch('rbac.current_user')
+    def test_role_required_success(self, mock_user, flask_app):
+        """Test role_required allows access if roles match exactly"""
+        from Development.rbac import role_required
+
+        mock_user.is_authenticated = True
+        mock_user.role = 'seller'
+
+        @role_required('seller')
+        def protected_view():
+            return "Success"
+
+        with flask_app.test_request_context():
+            assert protected_view() == "Success"
+
+    @patch('rbac.current_user')
+    def test_role_required_fail_wrong_role(self, mock_user, flask_app):
+        """Test role_required raises 403 if role does not match"""
+        from Development.rbac import role_required
+
+        mock_user.is_authenticated = True
+        mock_user.role = 'customer'  # Wrong role
+
+        @role_required('seller')
+        def protected_view():
+            return "Success"
+
+        with flask_app.test_request_context():
+            with pytest.raises(Forbidden):
+                protected_view()
+
+    @patch('rbac.current_user')
+    def test_admin_required_success(self, mock_user, flask_app):
+        """Test admin_required allows admin access"""
+        from Development.rbac import admin_required
+
+        mock_user.is_authenticated = True
+        mock_user.role = 'admin'
+
+        @admin_required
+        def admin_view():
+            return "Admin Area"
+
+        with flask_app.test_request_context():
+            assert admin_view() == "Admin Area"
+
+    @patch('rbac.current_user')
+    def test_admin_required_fail_wrong_role(self, mock_user, flask_app):
+        """Test that a seller cannot access admin area"""
+        from Development.rbac import admin_required
+
+        mock_user.is_authenticated = True
+        mock_user.role = 'seller'
+
+        @admin_required
+        def admin_view():
+            return "Admin Area"
+
+        with flask_app.test_request_context():
+            with pytest.raises(Forbidden):
+                admin_view()
+
+    @patch('rbac.current_user')
+    def test_seller_required_hierarchy(self, mock_user, flask_app):
+        """Test seller_required logic: admin and seller can access, customer cannot"""
+        from Development.rbac import seller_required
+
+        @seller_required
+        def seller_view():
+            return "Seller Area"
+
+        with flask_app.test_request_context():
+            # Case 1: Seller accesses Seller View -> Pass
+            mock_user.role = 'seller'
+            mock_user.is_authenticated = True
+            assert seller_view() == "Seller Area"
+
+            # Case 2: Admin accesses Seller View -> Pass (Hierarchy check)
+            mock_user.role = 'admin'
+            assert seller_view() == "Seller Area"
+
+            # Case 3: Customer accesses Seller View -> Fail
+            mock_user.role = 'customer'
+            with pytest.raises(Forbidden):
+                seller_view()
+
+    @patch('rbac.current_user')
+    def test_customer_required_hierarchy(self, mock_user, flask_app):
+        """Test customer_required logic: admin and customer can access, seller cannot"""
+        from Development.rbac import customer_required
+
+        @customer_required
+        def customer_view():
+            return "Customer Area"
+
+        with flask_app.test_request_context():
+            # Case 1: Customer -> Pass
+            mock_user.role = 'customer'
+            mock_user.is_authenticated = True
+            assert customer_view() == "Customer Area"
+
+            # Case 2: Seller -> Fail
+            mock_user.role = 'seller'
+            with pytest.raises(Forbidden):
+                customer_view()
+
+    @patch('rbac.current_user')
+    def test_permission_required(self, mock_user, flask_app):
+        """Test permission_required decorator"""
+        from Development.rbac import permission_required
+
+        mock_user.is_authenticated = True
+        mock_user.role = 'seller'
+
+        @permission_required('manage_inventory')
+        def inventory_view():
+            return "Inventory"
+
+        @permission_required('manage_sellers')
+        def admin_view():
+            return "Sellers"
+
+        with flask_app.test_request_context():
+            # Seller has 'manage_inventory' -> Pass
+            assert inventory_view() == "Inventory"
+
+            # Seller does NOT have 'manage_sellers' -> Fail
+            with pytest.raises(Forbidden):
+                admin_view()
+
+    @patch('rbac.current_user')
+    def test_unauthenticated_redirect(self, mock_user, flask_app):
+        """Test that unauthenticated users are redirected to login for all decorators"""
+        from Development.rbac import role_required, admin_required, seller_required, customer_required, permission_required
+
+        mock_user.is_authenticated = False
+
+        # Create dummy wrapped functions
+        wrapped_funcs = [
+            role_required('admin')(lambda: 'ok'),
+            admin_required(lambda: 'ok'),
+            seller_required(lambda: 'ok'),
+            customer_required(lambda: 'ok'),
+            permission_required('any_perm')(lambda: 'ok')
+        ]
+
+        with flask_app.test_request_context():
+            for func in wrapped_funcs:
+                response = func()
+                # Assert 302 Redirect
+                assert response.status_code == 302, f"Expected 302 redirect, got {response.status_code}"
+                # Assert redirect to login page
+                location = response.headers.get('Location', '')
+                assert '/login' in location or '/auth/login' in location, \
+                    f"Expected redirect to login, got: {location}"
