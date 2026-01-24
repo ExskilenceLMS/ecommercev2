@@ -621,7 +621,7 @@ class TestDataTypes:
 # =====================================================
 
 # Import RBAC class for testing
-from rbac import RBAC
+from Development.rbac import RBAC
 
 @pytest.mark.unit
 class TestRBACClass:
