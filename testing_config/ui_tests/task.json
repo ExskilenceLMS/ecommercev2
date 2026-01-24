@@ -1,0 +1,100 @@
+{
+  "id": "task",
+  "validation": {
+    "minScore": 80,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "templates/auth/login.html",
+            "requiredElements": ["form", "input", "button"]
+          },
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "templates/auth/register.html",
+            "requiredElements": ["form", "input"]
+          },
+          {
+            "subtask": "task_4_2_admin_dashboard_UI",
+            "file": "templates/admin/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          },
+          {
+            "subtask": "task_4_3_seller_sashboard_UI",
+            "file": "templates/seller/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          },
+          {
+            "subtask": "task_4_4_customer_dashboard_ui",
+            "file": "templates/customer/dashboard.html",
+            "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          },
+          {
+            "subtask": "task_4_5_product_listing_details",
+            "file": "templates/product/details.html",
+            "requiredElements": [".product-detail", ".product-image", ".product-info", "button"]
+          },
+          {
+            "subtask": "task_4_6_cart_checkout_flow",
+            "file": "templates/checkout/review.html",
+            "requiredElements": [".checkout-form", ".order-summary", "form"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".auth-container", ".auth-box", ".btn-primary"]
+          },
+          {
+            "subtask": "task_4_2_admin_dashboard_UI",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".card-header"]
+          },
+          {
+            "subtask": "task_4_3_seller_sashboard_UI",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".quick-actions"]
+          },
+          {
+            "subtask": "task_4_4_customer_dashboard_ui",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".dashboard-stats", ".stat-card", ".customer-actions"]
+          },
+          {
+            "subtask": "task_4_5_product_listing_details",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".product-grid", ".product-card", ".product-image", ".product-price"]
+          },
+          {
+            "subtask": "task_4_6_cart_checkout_flow",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".cart-items", ".cart-item", ".cart-summary", ".checkout-form"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": false,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": []
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
