@@ -612,3 +612,93 @@ class TestDataTypes:
             assert result[1] == 10, f"{table}.{column} should have precision 10"
             assert result[2] == 2, f"{table}.{column} should have scale 2"
 
+
+
+# =====================================================
+# Subtask: task_3_1_define_roles_and_permissions
+# Description: RBAC class with role hierarchy and permissions matrix
+# Files Changed: Development/rbac.py (RBAC class definition)
+# =====================================================
+
+# Import RBAC class for testing
+from rbac import RBAC
+
+@pytest.mark.unit
+class TestRBACClass:
+    """Test RBAC class methods and structure"""
+    
+    def test_rbac_has_role(self):
+        """Test RBAC.has_role method"""
+        assert RBAC.has_role('admin', 'admin') is True
+        assert RBAC.has_role('seller', 'admin') is False
+        assert RBAC.has_role(None, 'admin') is False
+    
+    def test_rbac_has_permission(self):
+        """Test RBAC.has_permission method"""
+        # Test Admin Permissions
+        assert RBAC.has_permission('admin', 'manage_sellers') is True
+        assert RBAC.has_permission('admin', 'place_orders') is False  # Admin doesn't have customer permissions
+        
+        # Test Seller Permissions
+        assert RBAC.has_permission('seller', 'manage_inventory') is True
+        assert RBAC.has_permission('seller', 'manage_sellers') is False
+        
+        # Test Customer Permissions
+        assert RBAC.has_permission('customer', 'manage_cart') is True
+        
+        # Edge Cases
+        assert RBAC.has_permission(None, 'manage_cart') is False
+        assert RBAC.has_permission('hacker', 'manage_cart') is False
+    
+    def test_rbac_get_user_permissions(self):
+        """Test RBAC.get_user_permissions method"""
+        perms = RBAC.get_user_permissions('seller')
+        assert 'manage_inventory' in perms
+        assert 'view_store_orders' in perms
+        assert 'manage_sellers' not in perms
+        
+        assert RBAC.get_user_permissions('unknown') == []
+        assert RBAC.get_user_permissions(None) == []
+    
+    def test_rbac_role_hierarchy(self):
+        """Test RBAC.ROLE_HIERARCHY structure"""
+        assert 'admin' in RBAC.ROLE_HIERARCHY
+        assert 'seller' in RBAC.ROLE_HIERARCHY
+        assert 'customer' in RBAC.ROLE_HIERARCHY
+        assert len(RBAC.ROLE_HIERARCHY['admin']) == 3
+        assert len(RBAC.ROLE_HIERARCHY['seller']) == 1
+        assert len(RBAC.ROLE_HIERARCHY['customer']) == 1
+    
+    def test_rbac_permissions_structure(self):
+        """Test RBAC.PERMISSIONS structure"""
+        assert 'admin' in RBAC.PERMISSIONS
+        assert 'seller' in RBAC.PERMISSIONS
+        assert 'customer' in RBAC.PERMISSIONS
+        assert len(RBAC.PERMISSIONS['admin']) > 0
+        assert len(RBAC.PERMISSIONS['seller']) > 0
+        assert len(RBAC.PERMISSIONS['customer']) > 0
+    
+    def test_rbac_admin_permissions(self):
+        """Test that admin has all admin-specific permissions"""
+        admin_perms = RBAC.get_user_permissions('admin')
+        assert 'manage_sellers' in admin_perms
+        assert 'manage_categories' in admin_perms
+        assert 'view_all_orders' in admin_perms
+        assert 'view_all_products' in admin_perms
+    
+    def test_rbac_seller_permissions(self):
+        """Test that seller has seller-specific permissions"""
+        seller_perms = RBAC.get_user_permissions('seller')
+        assert 'manage_products' in seller_perms
+        assert 'manage_inventory' in seller_perms
+        assert 'view_store_orders' in seller_perms
+        assert 'update_order_status' in seller_perms
+    
+    def test_rbac_customer_permissions(self):
+        """Test that customer has customer-specific permissions"""
+        customer_perms = RBAC.get_user_permissions('customer')
+        assert 'browse_products' in customer_perms
+        assert 'manage_cart' in customer_perms
+        assert 'place_orders' in customer_perms
+        assert 'view_own_orders' in customer_perms
+        assert 'manage_profile' in customer_perms
