@@ -41,6 +41,11 @@
             "subtask": "task_4_6_cart_checkout_flow",
             "file": "templates/checkout/review.html",
             "requiredElements": [".checkout-form", ".order-summary", "form"]
+          },
+          {
+            "subtask": "task_4_7_order_confirmation",
+            "file": "templates/checkout/confirmation.html",
+            "requiredElements": ["h1", "h2", "p", "a"]
           }
         ]
       },
@@ -76,6 +81,11 @@
             "subtask": "task_4_6_cart_checkout_flow",
             "file": "static/css/style.css",
             "requiredSelectors": [".cart-items", ".cart-item", ".cart-summary", ".checkout-form"]
+          },
+          {
+            "subtask": "task_4_7_order_confirmation",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".btn-primary", "a"]
           }
         ]
       }
