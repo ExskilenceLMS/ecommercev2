@@ -867,7 +867,7 @@ class TestRBACDecorators:
     @patch('rbac.current_user')
     def test_unauthenticated_redirect(self, mock_user, flask_app):
         """Test that unauthenticated users are redirected to login for all decorators"""
-        from rbac import role_required, admin_required, seller_required, customer_required, permission_required
+        from Development.rbac import role_required, admin_required, seller_required, customer_required, permission_required
         
         mock_user.is_authenticated = False
         
