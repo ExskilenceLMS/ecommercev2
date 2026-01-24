@@ -36,6 +36,11 @@
             "subtask": "task_4_5_product_listing_details",
             "file": "templates/product/details.html",
             "requiredElements": [".product-detail", ".product-image", ".product-info", "button"]
+          },
+          {
+            "subtask": "task_4_6_cart_checkout_flow",
+            "file": "templates/checkout/review.html",
+            "requiredElements": [".checkout-form", ".order-summary", "form"]
           }
         ]
       },
@@ -66,6 +71,11 @@
             "subtask": "task_4_5_product_listing_details",
             "file": "static/css/style.css",
             "requiredSelectors": [".product-grid", ".product-card", ".product-image", ".product-price"]
+          },
+          {
+            "subtask": "task_4_6_cart_checkout_flow",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".cart-items", ".cart-item", ".cart-summary", ".checkout-form"]
           }
         ]
       }
