@@ -768,7 +768,7 @@ class TestRBACDecorators:
     @patch('rbac.current_user')
     def test_admin_required_success(self, mock_user, flask_app):
         """Test admin_required allows admin access"""
-        from rbac import admin_required
+        from Development.rbac import admin_required
         
         mock_user.is_authenticated = True
         mock_user.role = 'admin'
@@ -783,7 +783,7 @@ class TestRBACDecorators:
     @patch('rbac.current_user')
     def test_admin_required_fail_wrong_role(self, mock_user, flask_app):
         """Test that a seller cannot access admin area"""
-        from rbac import admin_required
+        from Development.rbac import admin_required
         
         mock_user.is_authenticated = True
         mock_user.role = 'seller'
@@ -799,7 +799,7 @@ class TestRBACDecorators:
     @patch('rbac.current_user')
     def test_seller_required_hierarchy(self, mock_user, flask_app):
         """Test seller_required logic: admin and seller can access, customer cannot"""
-        from rbac import seller_required
+        from Development.rbac import seller_required
         
         @seller_required
         def seller_view():
@@ -823,7 +823,7 @@ class TestRBACDecorators:
     @patch('rbac.current_user')
     def test_customer_required_hierarchy(self, mock_user, flask_app):
         """Test customer_required logic: admin and customer can access, seller cannot"""
-        from rbac import customer_required
+        from Development.rbac import customer_required
         
         @customer_required
         def customer_view():
