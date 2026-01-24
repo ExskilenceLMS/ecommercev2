@@ -31,6 +31,11 @@
             "subtask": "task_4_4_customer_dashboard_ui",
             "file": "templates/customer/dashboard.html",
             "requiredElements": ["h1", ".dashboard-stats", ".stat-card"]
+          },
+          {
+            "subtask": "task_4_5_product_listing_details",
+            "file": "templates/product/details.html",
+            "requiredElements": [".product-detail", ".product-image", ".product-info", "button"]
           }
         ]
       },
@@ -56,6 +61,11 @@
             "subtask": "task_4_4_customer_dashboard_ui",
             "file": "static/css/style.css",
             "requiredSelectors": [".dashboard-stats", ".stat-card", ".customer-actions"]
+          },
+          {
+            "subtask": "task_4_5_product_listing_details",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".product-grid", ".product-card", ".product-image", ".product-price"]
           }
         ]
       }
