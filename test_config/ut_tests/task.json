@@ -28,6 +28,9 @@
     },
     "pytest": {
       "required": true,
+      "testFile": [
+        "testing_config/py_tests/tast.py"
+      ],
       "requiresFlask": false,
       "timeout": 30000
     }
