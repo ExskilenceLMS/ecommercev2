@@ -80,14 +80,33 @@ def run_static_validation(config):
                     
                     missing = []
                     for element in required_elements:
-                        # Simple regex check for HTML elements
-                        # Look for <element or </element
-                        pattern = rf'<{element}[>\s]|</{element}>'
-                        if not re.search(pattern, content, re.IGNORECASE):
+                        found = False
+                        
+                        # Check if it's a CSS selector (starts with . or #)
+                        if element.startswith('.') or element.startswith('#'):
+                            # Look for class="..." or id="..." containing the selector
+                            selector_name = element.lstrip('.#')
+                            if element.startswith('.'):
+                                # Look for class="selector" or class="... selector ..."
+                                pattern = rf'class\s*=\s*["\'][^"\']*\b{re.escape(selector_name)}\b'
+                            else:  # starts with #
+                                # Look for id="selector" or id="... selector ..."
+                                pattern = rf'id\s*=\s*["\'][^"\']*\b{re.escape(selector_name)}\b'
+                            
+                            if re.search(pattern, content, re.IGNORECASE):
+                                found = True
+                        else:
+                            # Regular HTML element check
+                            # Look for <element or </element
+                            pattern = rf'<{re.escape(element)}[>\s]|</{re.escape(element)}>'
+                            if re.search(pattern, content, re.IGNORECASE):
+                                found = True
+                        
+                        if not found:
                             missing.append(element)
                     
                     if missing:
-                        print(f"    ❌ Missing elements: {', '.join(missing)}")
+                        print(f"    ❌ Missing elements/selectors: {', '.join(missing)}")
                         results["html"] = False
                     else:
                         print(f"    ✅ All required elements found: {', '.join(required_elements)}")
