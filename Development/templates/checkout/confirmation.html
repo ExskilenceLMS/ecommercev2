@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="card" style="text-align: center; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #10b981; margin-bottom: 1rem;">✓ Order Placed Successfully!</h1>
+        <p style="font-size: 1.25rem; margin-bottom: 2rem;">Thank you for your order.</p>
+        
+        <div style="background: #f9fafb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+            <h2>Order Numbers:</h2>
+            {% for order in orders %}
+            <p style="font-size: 1.5rem; font-weight: bold; color: #2563eb;">{{ order[1] }}</p>
+            {% endfor %}
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{{ url_for('customer.orders') }}" class="btn btn-primary">View Orders</a>
+            <a href="{{ url_for('product.list') }}" class="btn btn-secondary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
