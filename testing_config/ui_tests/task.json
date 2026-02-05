@@ -1,0 +1,50 @@
+{
+  "id": "task",
+  "validation": {
+    "minScore": 80,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "templates/auth/login.html",
+            "requiredElements": ["form", "input", "button"]
+          },
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "templates/auth/register.html",
+            "requiredElements": ["form", "input"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "subtask": "task_4_1_login_registration_ui",
+            "file": "static/css/style.css",
+            "requiredSelectors": [".auth-container", ".auth-box", ".btn-primary"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": false,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": []
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
