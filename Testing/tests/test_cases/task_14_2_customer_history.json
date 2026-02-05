@@ -1,0 +1,55 @@
+{
+  "id": "task14p3",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/order/list.html",
+            "requiredElements": [
+              "table",
+              "div"
+            ]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Task 14 3 Customer History test",
+          "path": "/orders/",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {
+              "type": "url",
+              "value": "/orders/"
+            }
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
