@@ -1,0 +1,70 @@
+{
+  "id": "task6p1",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/auth/login.html",
+            "requiredElements": ["form", "input", "button", "label"]
+          },
+          {
+            "file": "templates/auth/register.html",
+            "requiredElements": ["form", "input", "button", "label"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Login page loads and renders template",
+          "path": "/auth/login",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='email']"},
+            {"type": "exists", "selector": "input[name='password']"},
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Register page loads and renders template",
+          "path": "/auth/register",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='email']"},
+            {"type": "exists", "selector": "input[name='password']"},
+            {"type": "exists", "selector": "input[name='confirm_password']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+

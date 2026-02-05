@@ -1,0 +1,78 @@
+{
+  "id": "task8p3",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/admin/categories.html",
+            "requiredElements": ["h1", "table"]
+          },
+          {
+            "file": "templates/admin/create_category.html",
+            "requiredElements": ["form", "input", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Categories page is accessible",
+          "path": "/admin/categories",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/categories"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "table"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Create category page is accessible",
+          "path": "/admin/categories/create",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/categories/create"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='name']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+

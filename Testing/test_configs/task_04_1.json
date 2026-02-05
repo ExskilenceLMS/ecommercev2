@@ -1,0 +1,14 @@
+{
+  "task_id": "04_1",
+  "task_name": "Task 4 - Subtask 4.1: Login & Registration UI",
+  "description": "Login and registration page wireframes",
+  "mandatory_tests": [
+    {
+      "name": "test_task_4_1_login_registration",
+      "description": "Test login and registration UI pages",
+      "file": "tests/test_task_4_1_login_registration.py"
+    }
+  ],
+  "optional_tests": []
+}
+
