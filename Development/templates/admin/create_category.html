@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Create Category - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Create New Category</h1>
+    </div>
+    
+    <div class="card" style="max-width: 600px;">
+        <form method="POST" action="{{ url_for('admin.create_category') }}">
+            <div class="form-group">
+                <label for="name">Category Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="parent_id">Parent Category (Optional)</label>
+                <select id="parent_id" name="parent_id">
+                    <option value="">None (Main Category)</option>
+                    {% for cat in parent_categories %}
+                    <option value="{{ cat[0] }}">{{ cat[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="slug">Slug (Optional - auto-generated if empty)</label>
+                <input type="text" id="slug" name="slug">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Category</button>
+            <a href="{{ url_for('admin.categories') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
