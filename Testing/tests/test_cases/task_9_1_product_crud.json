@@ -1,0 +1,83 @@
+{
+  "id": "task9p1",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/seller/products.html",
+            "requiredElements": ["h1", "table"]
+          },
+          {
+            "file": "templates/seller/create_product.html",
+            "requiredElements": ["form", "input", "button"]
+          },
+          {
+            "file": "templates/seller/edit_product.html",
+            "requiredElements": ["form", "input", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Products page is accessible",
+          "path": "/seller/products",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "seller"},
+            {"type": "fill", "selector": "input[name='password']", "value": "seller123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/seller/products"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "table"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Create product page is accessible",
+          "path": "/seller/products/create",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "seller"},
+            {"type": "fill", "selector": "input[name='password']", "value": "seller123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/seller/products/create"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='name']"},
+            {"type": "exists", "selector": "input[name='price']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+
