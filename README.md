@@ -56,26 +56,12 @@ ecommerce_project_updated/
 │       ├── conftest.py
 │       └── fixtures/
 │
-├── Testing/                       # All testing infrastructure
-│   ├── check_test.py             # Test runner (single task)
-│   ├── run_all_tests.py          # Test runner (all tasks)
-│   ├── test_configs/             # Test configurations
-│   │   ├── task_01.json
-│   │   ├── task_02.json
-│   │   └── ... (task_03.json through task_15.json)
-│   ├── tests/                    # All test files
-│   │   ├── test_database_schema.py
-│   │   ├── test_rbac.py
-│   │   ├── test_auth_ui.py
-│   │   ├── test_task_5.py
-│   │   ├── test_task_6.py
-│   │   └── ... (all test files)
-│   └── results/                  # Test result HTML reports
-│       ├── task_02_result.html
-│       ├── task_03_result.html
-│       └── ... (all result files)
+├── test_config/
+|   ├── py_tests/                # Backend Tests
+│   │   ├── task.py 
+|   ├── ui_tests/                # Frontend tests
+│   │   ├── task.json 
 │
-├── commit_readme.md              # Commit history documentation
 ├── requirements.txt              # Python dependencies
 ├── requirements-dev.txt          # Development dependencies
 ├── pytest.ini                   # Pytest configuration
@@ -256,27 +242,13 @@ This will:
 ### Run Tests for a Specific Task
 ```bash
 source venv/bin/activate
-./venv/bin/python Testing/check_test.py <task_id>
+./venv/bin/python testing_config/py_test/task.py
 ```
 
-Example:
-```bash
-./venv/bin/python Testing/check_test.py 5
-```
 
-### Run Tests with Optional Tests
-```bash
-./venv/bin/python Testing/check_test.py 5 --optional
-```
-
-### List All Available Tasks
-```bash
-./venv/bin/python Testing/check_test.py --list
-```
 
 ### View Test Results
 Test results are saved as HTML files in `Testing/results/`:
-- `task_02_result.html` through `task_15_result.html`
 - Open these files in a browser to view detailed test results
 
 ## Role Features
@@ -316,16 +288,6 @@ Test results are saved as HTML files in `Testing/results/`:
 
 ## Testing Structure
 
-- **Test Configurations:** `Testing/test_configs/task_XX.json` - Define mandatory and optional tests
-- **Test Files:** `Testing/tests/test_*.py` - All test implementations
-- **Test Runner:** `Testing/check_test.py` - Run tests for individual tasks
-- **Test Runner (All):** `Testing/run_all_tests.py` - Run all tests and generate reports
-- **Test Results:** `Testing/results/task_XX_result.html` - HTML test reports
-
-## Project Commits
-
-See `commit_readme.md` for detailed commit history and files to commit for each task (1-15).
-
-## License
-
+- **Test Configurations:** `test_configs/ui_tests/task.json` - Define mandatory and optional tests
+- **Test Files:** `test_configs/oy_tests/test.py` - All test implementations
 
