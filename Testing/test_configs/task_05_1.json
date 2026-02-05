@@ -1,0 +1,14 @@
+{
+  "task_id": "05_1",
+  "task_name": "Task 5 - Subtask 5.1: Flask Project Structure (MVC style)",
+  "description": "Flask application initialization and MVC structure",
+  "mandatory_tests": [
+    {
+      "name": "test_task_5_1_flask_structure",
+      "description": "Test Flask project structure",
+      "file": "tests/test_task_5_1_flask_structure.py"
+    }
+  ],
+  "optional_tests": []
+}
+
