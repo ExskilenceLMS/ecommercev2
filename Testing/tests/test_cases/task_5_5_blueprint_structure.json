@@ -1,0 +1,44 @@
+{
+  "id": "task5p5",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": false,
+        "rules": []
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Blueprint routes are accessible",
+          "path": "/auth/login",
+          "captureScreenshot": true,
+          "actions": [],
+          "assertions": [
+            {"type": "url", "value": "/auth/login"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
