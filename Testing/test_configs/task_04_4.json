@@ -1,0 +1,14 @@
+{
+  "task_id": "04_4",
+  "task_name": "Task 4 - Subtask 4.4: Customer Dashboard UI",
+  "description": "Customer dashboard wireframe",
+  "mandatory_tests": [
+    {
+      "name": "test_task_4_4_customer_dashboard",
+      "description": "Test customer dashboard UI",
+      "file": "tests/test_task_4_4_customer_dashboard.py"
+    }
+  ],
+  "optional_tests": []
+}
+
