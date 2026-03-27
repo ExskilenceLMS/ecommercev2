@@ -1,0 +1,13 @@
+{
+  "task_id": "03",
+  "task_name": "Authorization Design (RBAC)",
+  "description": "Role & permission matrix, route access rules, decorator design",
+  "mandatory_tests": [
+    {
+      "name": "test_rbac",
+      "description": "Test RBAC functionality",
+      "file": "tests/test_rbac.py"
+    }
+  ],
+  "optional_tests": []
+}
