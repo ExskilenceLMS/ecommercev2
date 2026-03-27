@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Order Details - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Order #{{ order[1] }}</h1>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Order Items</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_items %}
+                        <tr>
+                            <td>{{ item[4] }}</td>
+                            <td>{{ item[2] }}</td>
+                            <td>${{ "%.2f"|format(item[3]) }}</td>
+                            <td>${{ "%.2f"|format(item[5]) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Order Summary</h2>
+                </div>
+                <p><strong>Status:</strong> {{ order[3]|title }}</p>
+                <p><strong>Total:</strong> ${{ "%.2f"|format(order[8]) }}</p>
+                <p><strong>Date:</strong> {{ order[4].strftime('%Y-%m-%d %H:%M') if order[4] else 'N/A' }}</p>
+                <a href="{{ url_for('payment.invoice', order_id=order[0]) }}" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Invoice</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
