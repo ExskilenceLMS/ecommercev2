@@ -14,13 +14,14 @@ sys.path.insert(0, str(development_dir))
 from app import app, get_db_connection
 from utils import set_db_connection_func
 
+# Configure app for testing
+app.config['TESTING'] = True
+app.config['WTF_CSRF_ENABLED'] = False
+app.config['MYSQL_DB'] = 'ecommerce_test_db'
+
 @pytest.fixture
 def client():
     """Create a test client"""
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
-    app.config['MYSQL_DB'] = 'ecommerce_test_db'
-    
     with app.test_client() as client:
         with app.app_context():
             yield client
@@ -43,3 +44,9 @@ def auth_headers(client):
         return response
     return _login
 
+@pytest.fixture(scope="module")
+def live_server():
+    """Create a live Flask server for Playwright tests"""
+    from pytest_flask.plugin import live_server as pytest_flask_live_server
+    with pytest_flask_live_server(app) as server:
+        yield server
