@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Review Order</h1>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Shipping Address</h2>
+                </div>
+                <form method="POST" action="{{ url_for('checkout.place_order') }}">
+                    {% if addresses %}
+                    {% for addr in addresses %}
+                    <div style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 0.5rem;">
+                        <input type="radio" name="shipping_address_id" value="{{ addr[0] }}" {% if addr[7] %}checked{% endif %} id="addr_{{ addr[0] }}">
+                        <label for="addr_{{ addr[0] }}" style="margin-left: 0.5rem;">
+                            {{ addr[1] }}{% if addr[2] %}, {{ addr[2] }}{% endif %}<br>
+                            {{ addr[3] }}, {{ addr[4] }} {{ addr[5] }}<br>
+                            {{ addr[6] }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No addresses found. <a href="{{ url_for('customer.create_address') }}">Add an address</a></p>
+                    {% endif %}
+                    
+                    {% if addresses %}
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h2>Order Items</h2>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>{{ item[2] }}</td>
+                                    <td>{{ item[1] }}</td>
+                                    <td>${{ "%.2f"|format(item[3]) }}</td>
+                                    <td>${{ "%.2f"|format(item[3] * item[1]) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Place Order</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Order Summary</h2>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Subtotal:</span>
+                    <span>${{ "%.2f"|format(subtotal) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Tax:</span>
+                    <span>${{ "%.2f"|format(tax) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Shipping:</span>
+                    <span>${{ "%.2f"|format(shipping) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.25rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <span>Total:</span>
+                    <span>${{ "%.2f"|format(total) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
