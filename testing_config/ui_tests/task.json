@@ -1,0 +1,35 @@
+{
+  "id": "task",
+  "validation": {
+    "minScore": 80,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": false,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": []
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
