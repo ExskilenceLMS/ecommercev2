@@ -1,0 +1,14 @@
+{
+  "task_id": "05_2",
+  "task_name": "Task 5 - Subtask 5.2: MySQL Connection & Config",
+  "description": "MySQL database connection and configuration",
+  "mandatory_tests": [
+    {
+      "name": "test_task_5_2_mysql_config",
+      "description": "Test MySQL connection and configuration",
+      "file": "tests/test_task_5_2_mysql_config.py"
+    }
+  ],
+  "optional_tests": []
+}
+
