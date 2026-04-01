@@ -1,0 +1,79 @@
+{
+  "id": "task8p2",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/admin/sellers.html",
+            "requiredElements": ["h1", "table"]
+          },
+          {
+            "file": "templates/admin/create_seller.html",
+            "requiredElements": ["form", "input", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": false,
+        "rules": []
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Sellers page is accessible",
+          "path": "/admin/sellers",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/sellers"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "table"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Create seller page is accessible",
+          "path": "/admin/sellers/create",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='email']", "value": "admin"},
+            {"type": "fill", "selector": "input[name='password']", "value": "admin123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/admin/sellers/create"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "form"},
+            {"type": "exists", "selector": "input[name='email']"},
+            {"type": "exists", "selector": "input[name='store_name']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
+
