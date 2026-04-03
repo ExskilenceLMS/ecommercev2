@@ -1,0 +1,146 @@
+{
+  "id": "task4p6",
+  "validation": {
+    "minScore": 70,
+    "static": {
+      "required": true,
+      "html": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "templates/cart/view.html",
+            "requiredElements": ["h1", "table", "th", "a"]
+          },
+          {
+            "file": "templates/checkout/review.html",
+            "requiredElements": ["h1", "form", "button"]
+          }
+        ]
+      },
+      "css": {
+        "isMandatory": true,
+        "rules": [
+          {
+            "file": "static/css/style.css",
+            "requiredSelectors": [".card-header", "table"]
+          }
+        ]
+      }
+    },
+    "dynamic": {
+      "required": true,
+      "requiresFlask": true,
+      "flaskConfig": {
+        "appPath": "Development/app.py",
+        "port": 5000,
+        "startupTimeout": 15000
+      },
+      "baseUrl": "http://localhost:5000",
+      "tests": [
+        {
+          "isMandatory": true,
+          "name": "Cart page loads correctly",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "visible", "selector": "table"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Cart page has table structure",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "th"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Cart page has checkout button",
+          "path": "/cart",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/cart"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "a[href*='checkout']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Checkout review page loads correctly",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "visible", "selector": "h1"},
+            {"type": "exists", "selector": "form[method='POST']"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Checkout page has shipping address section",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": ".card-header h2"}
+          ]
+        },
+        {
+          "isMandatory": true,
+          "name": "Checkout page has place order button",
+          "path": "/checkout/review",
+          "captureScreenshot": true,
+          "actions": [
+            {"type": "fill", "selector": "input[name='username']", "value": "customer"},
+            {"type": "fill", "selector": "input[name='password']", "value": "customer123"},
+            {"type": "click", "selector": "button[type='submit']"},
+            {"type": "wait", "duration": 2000},
+            {"type": "goto", "path": "/checkout/review"}
+          ],
+          "assertions": [
+            {"type": "exists", "selector": "button[type='submit']"}
+          ]
+        }
+      ]
+    },
+    "pytest": {
+      "required": true,
+      "requiresFlask": false,
+      "timeout": 30000
+    }
+  }
+}
